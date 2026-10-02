@@ -85,6 +85,8 @@ Setup:
 
 Notifications emails fail (and are retried) while Resend is not configured. Run `npm test` for authorization, unread-count, email-failure and duplicate-prevention tests (they use an in-memory PGlite database and a mocked mailer, so no real email is sent).
 
+A declined request can be sent again by the same person 24 hours after the decline (`declineCooldown` in `lib/contact-policy.ts`); revoked requests (including admin/abuse revocations) stay closed. Run `npm run db:migrate` to backfill existing declines.
+
 ## Administration
 
 Apply migrations (`npm run db:migrate`) before starting the updated app. Register your own account, then grant its admin role from a trusted terminal:

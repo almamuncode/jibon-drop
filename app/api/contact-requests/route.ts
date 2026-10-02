@@ -2,7 +2,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkOrigin, secretHash } from "@/lib/security";
 import { published } from "@/lib/public";
-import { approvalLifetime } from "@/lib/contact-policy";
+import { approvalLifetime, declineCooldown } from "@/lib/contact-policy";
 import {
   ContactError,
   contactFailure,
@@ -41,6 +41,8 @@ export async function POST(req: Request) {
           );
         phoneHash = secretHash(donor.phone);
         expiresAt = new Date(Date.now() + approvalLifetime);
+      } else if (body.action === "decline") {
+        expiresAt = new Date(Date.now() + declineCooldown);
       }
       await tx.contactRequest.update({
         where: { id: request.id },

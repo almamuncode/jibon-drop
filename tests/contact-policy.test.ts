@@ -42,3 +42,19 @@ describe("contact approvals", () => {
     expect(approvalLifetime).toBe(86400000);
   });
 });
+describe("decline cooldown", () => {
+  const declined = {
+    status: "DECLINED",
+    expiresAt: new Date(now.getTime() + 1000),
+  };
+  it("stays declined during the cooldown", () =>
+    expect(contactStatus(declined, now)).toBe("DECLINED"));
+  it("allows a new request after 24 hours", () =>
+    expect(contactStatus(declined, new Date(now.getTime() + 2000))).toBe(
+      "EXPIRED",
+    ));
+  it("never auto-resets revoked requests", () =>
+    expect(contactStatus({ status: "REVOKED", expiresAt: null }, now)).toBe(
+      "REVOKED",
+    ));
+});
