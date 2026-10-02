@@ -1,5 +1,6 @@
 import { requireDonor } from "@/lib/security";
 import { ProfileEditor } from "@/components/profile-editor";
+import { locationLabel } from "@/lib/public";
 export default async function EditProfile() {
   const d = await requireDonor();
   return (
@@ -22,6 +23,13 @@ export default async function EditProfile() {
           consent: !!d.consentAt,
           hasPhoto: !!d.imageUrl,
           phone: d.phone || "",
+          imageUrl: d.imageUrl,
+          location: await locationLabel([
+            d.divisionId,
+            d.districtId,
+            d.localityId,
+            d.areaId,
+          ]),
         }}
       />
     </div>

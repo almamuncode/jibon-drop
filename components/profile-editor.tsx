@@ -5,6 +5,7 @@ import { Locations, LocationValue } from "./locations";
 import { PhotoEditor } from "./photo";
 import { api } from "./dashboard";
 import { bloodGroups } from "@/lib/validation";
+import { Avatar } from "./ui";
 type Profile = {
   name: string;
   bloodGroup: string;
@@ -18,6 +19,8 @@ type Profile = {
   consent: boolean;
   hasPhoto: boolean;
   phone: string;
+  imageUrl: string | null;
+  location: string;
 };
 export function ProfileEditor({ profile: p }: { profile: Profile }) {
   const router = useRouter();
@@ -28,7 +31,59 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
     areaId: p.areaId || "",
   });
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [visible, setVisible] = useState(p.visible);
   const [message, setMessage] = useState("");
+  if (!editing)
+    return (
+      <section className="profile-overview dashboard-panel">
+        <div className="profile-identity">
+          <Avatar name={p.name} url={p.imageUrl} />
+          <div>
+            <span className="eyebrow">My donor profile</span>
+            <h2>{p.name || "Complete your profile"}</h2>
+            <p>{p.location || "Location not set"}</p>
+          </div>
+          <span className="blood-badge">{p.bloodGroup || "—"}</span>
+        </div>
+        <dl className="profile-details">
+          <div>
+            <dt>Contact number</dt>
+            <dd>{p.phone || "Not added"}</dd>
+          </div>
+          <div>
+            <dt>Availability</dt>
+            <dd>{p.available ? "Willing to donate" : "Unavailable"}</dd>
+          </div>
+          <div>
+            <dt>Directory listing</dt>
+            <dd>{p.visible && p.consent ? "Public" : "Private"}</dd>
+          </div>
+          <div>
+            <dt>Contact-sharing consent</dt>
+            <dd>{p.consent ? "Given" : "Not given"}</dd>
+          </div>
+        </dl>
+        <button
+          className="button"
+          type="button"
+          onClick={() => {
+            setMessage("");
+            setLoc({
+              divisionId: p.divisionId || "",
+              districtId: p.districtId || "",
+              localityId: p.localityId || "",
+              areaId: p.areaId || "",
+            });
+            setVisible(p.visible);
+            setEditing(true);
+          }}
+        >
+          Change profile
+        </button>
+        {message && <p role="status">{message}</p>}
+      </section>
+    );
   return (
     <>
       <form
@@ -51,6 +106,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
               consent: f.get("consent") === "on",
             });
             setMessage("Profile saved.");
+            setEditing(false);
             router.refresh();
           } catch (e) {
             setMessage((e as Error).message);
@@ -120,20 +176,42 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
         </label>
         <p className="muted">This is not medical clearance.</p>
         <label className="check">
-          <input name="consent" type="checkbox" defaultChecked={p.consent} />I
-          consent to a public donor profile and to sharing my mobile number
+          <input
+            id="profile-consent"
+            name="consent"
+            type="checkbox"
+            defaultChecked={p.consent}
+            required={visible}
+            aria-describedby="listing-consent-help"
+          />
+          I consent to a public donor profile and to sharing my mobile number
           through the contact action.
         </label>
         <label className="check">
-          <input name="visible" type="checkbox" defaultChecked={p.visible} />
+          <input
+            name="visible"
+            type="checkbox"
+            checked={visible}
+            onChange={(e) => setVisible(e.target.checked)}
+          />
           Show my listing in the donor directory
         </label>
-        <p className="muted">
+        <p className="muted" id="listing-consent-help">
+          To publish your listing, check the contact-sharing consent box above.
+          You can save a private profile by leaving the listing option off.{" "}
           Anyone can search and contact listed donors. Withdraw consent or hide
           your listing at any time.
         </p>
         <button className="button" disabled={busy}>
           {busy ? "Saving…" : "Save profile"}
+        </button>
+        <button
+          className="text-button"
+          type="button"
+          disabled={busy}
+          onClick={() => setEditing(false)}
+        >
+          Cancel
         </button>
         <p role="status">{message}</p>
       </form>

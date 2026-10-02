@@ -109,6 +109,8 @@ async function main() {
     (await call("contact", { publicId: donor.publicId })).data.phone,
     "+8801712345678",
   );
+  // Respect Better Auth’s short-window registration throttle.
+  await new Promise((resolve) => setTimeout(resolve, 11000));
   const second = await call("auth/sign-up/email", {
     name: "Other fixture",
     email: "second@example.com",
@@ -284,6 +286,9 @@ async function main() {
     .getByRole("button", { name: "Create account", exact: true })
     .click();
   await page.waitForURL("**/dashboard/profile");
+  await page
+    .getByRole("button", { name: "Change profile", exact: true })
+    .click();
   await page.getByLabel("Contact mobile number").fill("01912345678");
   await page.getByLabel("Blood group", { exact: true }).selectOption("B+");
   await page.getByLabel("Division", { exact: true }).selectOption("division:1");
@@ -305,9 +310,36 @@ async function main() {
     path: "/tmp/jibondrop-account-mobile.png",
     fullPage: true,
   });
+  await page.goto(base + "/dashboard");
+  await page.locator('summary[aria-label="Open account options"]').click();
+  await page
+    .getByRole("link", { name: "Settings", exact: true })
+    .first()
+    .click();
+  await page.getByLabel("Current password", { exact: true }).fill(password);
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("updated-Isolated-password-42");
+  await page
+    .getByLabel("Confirm new password", { exact: true })
+    .fill("updated-Isolated-password-42");
+  await page
+    .getByRole("button", { name: "Update password", exact: true })
+    .click();
+  await page
+    .getByText(
+      "Password updated. Other signed-in sessions have been logged out.",
+    )
+    .waitFor();
+  await page.screenshot({
+    path: "/tmp/jibondrop-settings-mobile.png",
+    fullPage: true,
+  });
   await page.goto(base + "/login");
   await page.getByLabel("Email or username").fill("browser_fixture");
-  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("updated-Isolated-password-42");
   await page.getByRole("button", { name: "Log in", exact: true }).click();
   await page.waitForURL("**/dashboard");
   await browser.close();

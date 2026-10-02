@@ -5,6 +5,7 @@ import {
   Phone,
   HeartHandshake,
   ShieldCheck,
+  Droplet,
 } from "lucide-react";
 import { SearchForm } from "@/components/search";
 export default function Home() {
@@ -12,21 +13,24 @@ export default function Home() {
     <>
       <section className="hero">
         <div className="hero-copy">
+          <div className="hero-symbol" aria-hidden="true">
+            <Droplet size={34} strokeWidth={1.5} />
+          </div>
           <div className="eyebrow">
             <span />
-            Connecting people across Bangladesh
+            Blood donors across Bangladesh
           </div>
           <h1>
-            Find blood donors.
+            A little of you.
             <br />
-            <span>Give life a chance.</span>
+            <span>A lifeline for someone.</span>
           </h1>
           <p className="lead">
-            When every moment matters, finding a donor should be simple. Connect
-            directly with people willing to help, near you.
+            Connect with blood donors near you. Search by blood group and
+            location, then reach out when you need support.
           </p>
-          <Link className="text-link" href="/register">
-            Become a donor. Be someone’s hope.
+          <Link className="hero-cta" href="/register">
+            Become a donor
             <ArrowRight size={18} />
           </Link>
           <div className="trust">
@@ -39,7 +43,7 @@ export default function Home() {
       <section className="how">
         <div className="section-title">
           <span className="eyebrow">A simple way to help</span>
-          <h2>A connection that can make a difference.</h2>
+          <h2>Find support in three simple steps.</h2>
           <p>Find the right blood group and reach out directly.</p>
         </div>
         <div className="steps">

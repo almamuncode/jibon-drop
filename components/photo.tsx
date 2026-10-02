@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 export async function compressPhoto(file: File) {
   if (
     !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
@@ -52,6 +53,7 @@ export async function compressPhoto(file: File) {
   }
 }
 export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
+  const router = useRouter();
   const [preview, setPreview] = useState("");
   const [blob, setBlob] = useState<Blob | null>(null);
   const [message, setMessage] = useState("");
@@ -69,6 +71,7 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
       if (!r.ok) throw new Error(d.error);
       setMessage(remove ? "Photo removed." : "Photo saved.");
       setBlob(null);
+      router.refresh();
     } catch (e) {
       setMessage((e as Error).message);
     } finally {

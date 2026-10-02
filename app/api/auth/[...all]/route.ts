@@ -1,4 +1,5 @@
 import { registrationSchema } from "@/lib/validation";
+import { emailConfigured } from "@/lib/email";
 import { getAuth } from "@/lib/auth";
 import { checkOrigin, rateLimit, requestIp } from "@/lib/security";
 export const dynamic = "force-dynamic";
@@ -20,16 +21,16 @@ async function handle(req: Request) {
         );
     }
     const path = new URL(req.url).pathname;
-    // Account identity changes/recovery require verified email delivery. Keep them disabled until configured.
+    // Recovery and linking remain disabled; email changes require configured delivery.
     if (
       [
         "/delete-user",
-        "/change-email",
         "/request-password-reset",
         "/reset-password",
         "/link-social",
         "/link-account",
-      ].some((p) => path.endsWith(p))
+      ].some((p) => path.endsWith(p)) ||
+      (path.endsWith("/change-email") && !emailConfigured())
     )
       return Response.json(
         { error: "This account action is not available." },

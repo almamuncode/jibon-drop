@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
-import { put, del } from "@vercel/blob";
+import { put, del, BlobAccessError, BlobError } from "@vercel/blob";
 import { db } from "@/lib/db";
+import { blobToken } from "@/lib/blob";
 import {
   checkOrigin,
   rateLimit,
@@ -24,7 +26,7 @@ async function cleanup(url: string) {
     update: {},
   });
   try {
-    await del(url);
+    await del(url, { token: blobToken() });
     await db().blobCleanup.delete({ where: { url } });
   } catch {
     /* Persistent cleanup job retries failed deletions. */
@@ -178,8 +180,7 @@ async function handle(
         if (donor.imageUrl) await cleanup(donor.imageUrl);
         return NextResponse.json({ ok: true });
       }
-      if (!process.env.BLOB_READ_WRITE_TOKEN)
-        throw new Error("Profile uploads require Vercel Blob configuration.");
+      const token = blobToken();
       if (Number(req.headers.get("content-length")) > 120000)
         throw new Error("Photo too large.");
       const file = (await req.formData()).get("photo");
@@ -187,6 +188,7 @@ async function handle(
         throw new Error("Choose a photo under 100 KB.");
       const bytes = await validateImage(Buffer.from(await file.arrayBuffer()));
       const blob = await put(`profiles/${crypto.randomUUID()}.webp`, bytes, {
+        token,
         access: "public",
         contentType: "image/webp",
         addRandomSuffix: true,
@@ -221,6 +223,33 @@ async function handle(
     }
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   } catch (e) {
+    if (
+      e instanceof BlobError &&
+      e.message.includes("Cannot use public access on a private store")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Photo uploads need a public Blob store. The configured store is private. You can skip the photo while the site owner updates storage.",
+        },
+        { status: 503 },
+      );
+    }
+    if (e instanceof BlobAccessError) {
+      return NextResponse.json(
+        {
+          error:
+            "Photo storage is unavailable. You can skip the photo and save your profile. The site owner needs to update the Vercel Blob token.",
+        },
+        { status: 503 },
+      );
+    }
+    if (e instanceof ZodError) {
+      return NextResponse.json(
+        { error: e.issues.map((issue) => issue.message).join(" ") },
+        { status: 400 },
+      );
+    }
     const message = e instanceof Error ? e.message : "Request failed";
     const safe =
       message.includes("Invalid `") || message.includes("Unique constraint")

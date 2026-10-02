@@ -28,7 +28,7 @@ The location seed is repeatable and inserts no donors. No SMS provider or SMS cr
 
 Google sign-in is disabled visibly when credentials are missing. No fake successful OAuth path exists. The Google avatar is not automatically published as a donor photo; donors choose their public photo separately. Users registered with a password must use that login method: automatic Google/password account linking is disabled to prevent takeover of unverified manual email accounts. Google-only accounts use Google login and do not have a local password by default.
 
-Manual email accounts are not email-verified. Password-reset email delivery and email changes are not enabled; do not promise email recovery. An outbound email service and verified recovery flow can be added later. Users can continue using their registered password or Google as appropriate. Direct library deletion/recovery/linking endpoints are blocked so they cannot bypass donor data cleanup or create unverified account takeover paths.
+Manual registration does not require email verification. Settings supports password changes with the current password and revokes other sessions. To enable verified email changes, set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on your verified Resend domain), then restart locally or redeploy. Email changes only take effect after verification; verified accounts also approve the change from their current address. Password recovery remains disabled. Users can continue using their registered password or Google as appropriate. Direct library deletion/recovery/linking endpoints are blocked so they cannot bypass donor data cleanup or create unverified account takeover paths.
 
 ## Migration from phone OTP
 

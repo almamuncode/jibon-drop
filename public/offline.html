@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>You’re offline · JibonDrop</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f7f5f5;
+        color: #211b1d;
+        font:
+          16px/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 360px;
+        padding: 32px;
+        margin: 20px;
+        background: white;
+        border-radius: 28px;
+      }
+      h1 {
+        font-size: 28px;
+        line-height: 1.2;
+      }
+      p {
+        color: #736b6e;
+      }
+      a {
+        display: inline-block;
+        background: #df0715;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 99px;
+        text-decoration: none;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #161214;
+          color: #f4edef;
+        }
+        main {
+          background: #211b1e;
+        }
+        p {
+          color: #b9adb2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <strong>JibonDrop</strong>
+      <h1>You’re offline</h1>
+      <p>
+        Reconnect to search donors and manage your account. Donor availability
+        and contact information need a live connection.
+      </p>
+      <a href="/">Try again</a>
+    </main>
+  </body>
+</html>

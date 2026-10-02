@@ -6,13 +6,10 @@ export default function Register() {
     <div className="container auth-shell">
       <div className="auth-card">
         <span className="eyebrow">Join the donor directory</span>
-        <h1>
-          A little of you.
-          <br />A lot of hope.
-        </h1>
+        <h1>Become a blood donor</h1>
         <p>
           Create an account or continue with Google. Then add your contact
-          number, blood group and location. No SMS is required.
+          number, blood group and location.
         </p>
         <AuthForm register googleEnabled={googleConfigured()} />
         <p className="muted">

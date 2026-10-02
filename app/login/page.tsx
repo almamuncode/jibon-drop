@@ -11,7 +11,7 @@ export default async function Login({
     <div className="container auth-shell">
       <div className="auth-card">
         <span className="eyebrow">Welcome back</span>
-        <h1>Your next act of kindness starts here.</h1>
+        <h1>Log in to JibonDrop</h1>
         <p>Sign in with Google, or use your email or username and password.</p>
         {error && (
           <p className="error" role="alert">

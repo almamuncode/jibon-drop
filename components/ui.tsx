@@ -25,6 +25,7 @@ export function DashboardNav() {
       <Link href="/dashboard">Overview</Link>
       <Link href="/dashboard/profile">My profile</Link>
       <Link href="/dashboard/donations">Donation records</Link>
+      <Link href="/dashboard/settings">Settings</Link>
     </nav>
   );
 }

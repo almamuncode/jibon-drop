@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { username } from "better-auth/plugins";
 import { db } from "./db";
+import { emailConfigured, sendAccountEmail } from "./email";
 export function googleConfigured() {
   return !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 }
@@ -22,6 +23,27 @@ function createAuth() {
     secret,
     baseURL,
     database: prismaAdapter(db(), { provider: "postgresql" }),
+    user: {
+      changeEmail: {
+        enabled: emailConfigured(),
+        sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+          await sendAccountEmail(
+            user.email,
+            "Approve your JibonDrop email change",
+            `An email change to ${newEmail} was requested for your JibonDrop account.\n\nApprove this change: ${url}\n\nIf you did not request this, ignore this email.`,
+          );
+        },
+      },
+    },
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendAccountEmail(
+          user.email,
+          "Verify your JibonDrop email",
+          `Verify this email address for your JibonDrop account:\n\n${url}\n\nIf you did not request this, ignore this email.`,
+        );
+      },
+    },
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 10,

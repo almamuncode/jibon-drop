@@ -43,6 +43,7 @@ export const profileSchema = z
   })
   .refine((v) => !v.visible || v.consent, {
     message: "Contact-sharing consent is required for a public listing.",
+    path: ["consent"],
   });
 export function dhakaToday(now = new Date()) {
   return new Intl.DateTimeFormat("en-CA", {
