@@ -1,4 +1,11 @@
 export const bangla: Record<string, string> = {
+  "unread notifications": "অপঠিত বিজ্ঞপ্তি",
+  "We couldn’t refresh notifications.": "বিজ্ঞপ্তি হালনাগাদ করা যায়নি।",
+  "Checking for new requests…": "নতুন অনুরোধ খোঁজা হচ্ছে…",
+  "New requests are waiting for your review.":
+    "নতুন অনুরোধ আপনার পর্যালোচনার অপেক্ষায় আছে।",
+  "You’re all caught up.": "নতুন কোনো অনুরোধ নেই।",
+  New: "নতুন",
   "Public profile consent": "প্রোফাইল প্রকাশের সম্মতি",
   "Public profile consent is required for a public listing.":
     "তালিকায় প্রকাশ করতে প্রোফাইল প্রকাশের সম্মতি প্রয়োজন।",

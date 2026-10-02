@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { AccountMenu } from "./account-menu";
 import { MobileNav } from "./mobile-nav";
 import { cache } from "react";
+import { unreadCount } from "@/lib/notifications";
 
 const navigationSession = cache(async () => {
   const requestHeaders = await headers();
@@ -16,7 +17,12 @@ const navigationSession = cache(async () => {
 
 export async function MobileNavigation() {
   const session = await navigationSession();
-  return <MobileNav signedIn={!!session} />;
+  return (
+    <MobileNav
+      signedIn={!!session}
+      unreadNotifications={session ? await unreadCount(session.user.id) : 0}
+    />
+  );
 }
 
 export async function AuthNavigation() {
@@ -44,8 +50,10 @@ export async function AuthNavigation() {
       _count: { select: { contactRequests: { where: { status: "PENDING" } } } },
     },
   });
+  const unreadNotifications = await unreadCount(session.user.id);
   return (
     <AccountMenu
+      unreadNotifications={unreadNotifications}
       isAdmin={user?.role === "ADMIN"}
       pendingRequests={donor?._count.contactRequests || 0}
       name={donor?.name || session.user.name}

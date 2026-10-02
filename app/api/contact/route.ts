@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { db } from "@/lib/db";
+import { createNotification, deliverNotification } from "@/lib/notifications";
 import { published } from "@/lib/public";
 import { checkOrigin, secretHash } from "@/lib/security";
 import { approvalValid, contactStatus } from "@/lib/contact-policy";
@@ -50,6 +52,7 @@ export async function POST(req: Request) {
     const user = await contactUser(req);
     const body = contactInput.parse(await req.json());
     await limitContact(req, user.id);
+    let notificationId: string | null = null;
     const result = await db().$transaction(async (tx) => {
       // All grants, disclosures and profile privacy changes serialize on this row.
       const rows = await tx.$queryRaw<
@@ -105,8 +108,16 @@ export async function POST(req: Request) {
           expiresAt: null,
         },
       });
+      if (donor.userId)
+        notificationId = (
+          await createNotification(tx, donor.userId, request.id)
+        ).id;
       return { id: request.id, status: "PENDING", expiresAt: null };
     });
+    if (notificationId) {
+      const id = notificationId;
+      after(() => deliverNotification(id));
+    }
     return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return contactFailure(error);

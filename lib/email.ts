@@ -6,6 +6,7 @@ export async function sendAccountEmail(
   to: string,
   subject: string,
   text: string,
+  failure = "We couldn’t send the verification email. Please try again later.",
 ) {
   if (!emailConfigured()) throw new Error("Email delivery is not configured.");
   const response = await fetch("https://api.resend.com/emails", {
@@ -22,8 +23,5 @@ export async function sendAccountEmail(
       text,
     }),
   });
-  if (!response.ok)
-    throw new Error(
-      "We couldn’t send the verification email. Please try again later.",
-    );
+  if (!response.ok) throw new Error(failure);
 }

@@ -5,11 +5,21 @@ import { db } from "@/lib/db";
 import { contactStatus } from "@/lib/contact-policy";
 import { dateLabel } from "@/lib/format";
 import { ContactDecision } from "@/components/contact-requests";
+import { NotificationStatus } from "@/components/notifications";
+import {
+  markRequestRead,
+  unreadCount,
+  unreadRequestIds,
+} from "@/lib/notifications";
 import { ReportAbuse } from "@/components/report-abuse";
 export default async function RequestsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ receivedPage?: string; sentPage?: string }>;
+  searchParams: Promise<{
+    receivedPage?: string;
+    sentPage?: string;
+    request?: string;
+  }>;
 }) {
   const params = await searchParams;
   const pageNumber = (value?: string) =>
@@ -21,38 +31,54 @@ export default async function RequestsPage({
   const donor = await requireDonor();
   const t = await getTranslation();
   const locale = await getLocale();
-  const [received, sent, receivedTotal, sentTotal] = await Promise.all([
-    db().contactRequest.findMany({
-      where: { donorId: donor.id },
-      orderBy: { updatedAt: "desc" },
-      take: pageSize,
-      skip: (receivedPage - 1) * pageSize,
-      select: {
-        id: true,
-        message: true,
-        status: true,
-        createdAt: true,
-        expiresAt: true,
-        requester: { select: { name: true } },
-      },
-    }),
-    db().contactRequest.findMany({
-      where: { requesterId: donor.userId! },
-      orderBy: { updatedAt: "desc" },
-      take: pageSize,
-      skip: (sentPage - 1) * pageSize,
-      select: {
-        id: true,
-        message: true,
-        status: true,
-        createdAt: true,
-        expiresAt: true,
-        donor: { select: { name: true, publicId: true } },
-      },
-    }),
-    db().contactRequest.count({ where: { donorId: donor.id } }),
-    db().contactRequest.count({ where: { requesterId: donor.userId! } }),
-  ]);
+  // Capture "new" markers first, then mark the opened request as read.
+  const unreadIds = await unreadRequestIds(donor.userId!);
+  const opened = params.request?.slice(0, 64);
+  if (opened) await markRequestRead(donor.userId!, opened);
+  const unread = await unreadCount(donor.userId!);
+  const receivedSelect = {
+    id: true,
+    message: true,
+    status: true,
+    createdAt: true,
+    expiresAt: true,
+    requester: { select: { name: true } },
+  } as const;
+  const [receivedPageRows, sent, receivedTotal, sentTotal, openedRow] =
+    await Promise.all([
+      db().contactRequest.findMany({
+        where: { donorId: donor.id },
+        orderBy: { updatedAt: "desc" },
+        take: pageSize,
+        skip: (receivedPage - 1) * pageSize,
+        select: receivedSelect,
+      }),
+      db().contactRequest.findMany({
+        where: { requesterId: donor.userId! },
+        orderBy: { updatedAt: "desc" },
+        take: pageSize,
+        skip: (sentPage - 1) * pageSize,
+        select: {
+          id: true,
+          message: true,
+          status: true,
+          createdAt: true,
+          expiresAt: true,
+          donor: { select: { name: true, publicId: true } },
+        },
+      }),
+      db().contactRequest.count({ where: { donorId: donor.id } }),
+      db().contactRequest.count({ where: { requesterId: donor.userId! } }),
+      opened
+        ? db().contactRequest.findFirst({
+            where: { id: opened, donorId: donor.id },
+            select: receivedSelect,
+          })
+        : null,
+    ]);
+  const received = openedRow
+    ? [openedRow, ...receivedPageRows.filter((r) => r.id !== openedRow.id)]
+    : receivedPageRows;
   const sharingEnabled =
     donor.sharePhone &&
     donor.visible &&
@@ -71,6 +97,7 @@ export default async function RequestsPage({
           )}
         </p>
       </div>
+      <NotificationStatus initial={unread} />
       <div className="notice">
         <p>
           {t(
@@ -82,8 +109,22 @@ export default async function RequestsPage({
       <section className="request-list">
         <h2>{t("Received requests")}</h2>
         {received.map((request) => (
-          <article className="dashboard-panel" key={request.id}>
-            <h3>{request.requester.name}</h3>
+          <article
+            className={
+              "dashboard-panel" +
+              (unreadIds.has(request.id) || request.id === opened
+                ? " new-request"
+                : "")
+            }
+            id={"request-" + request.id}
+            key={request.id}
+          >
+            <h3>
+              {request.requester.name}
+              {unreadIds.has(request.id) && (
+                <span className="unread-badge">{t("New")}</span>
+              )}
+            </h3>
             <p className="muted">
               {dateLabel(request.createdAt, locale)} ·{" "}
               {t(contactStatus(request))}

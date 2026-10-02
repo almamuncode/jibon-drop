@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "./ui";
 import { authClient } from "@/lib/auth-client";
+import { UnreadBadge } from "@/components/notifications";
 
 export function AccountMenu({
   name,
@@ -20,12 +21,14 @@ export function AccountMenu({
   image,
   isAdmin = false,
   pendingRequests = 0,
+  unreadNotifications = 0,
 }: {
   name: string;
   email: string;
   image: string | null;
   isAdmin?: boolean;
   pendingRequests?: number;
+  unreadNotifications?: number;
 }) {
   const t = useTranslation();
 
@@ -61,6 +64,7 @@ export function AccountMenu({
     >
       <summary aria-label={t("Open account options")}>
         <Avatar name={name} url={image} />
+        <UnreadBadge initial={unreadNotifications} />
         <ChevronDown size={15} aria-hidden="true" />
       </summary>
       <div className="account-dropdown">
@@ -90,6 +94,9 @@ export function AccountMenu({
           <Link key={href} href={href} onClick={close}>
             <Icon size={18} />
             {label}
+            {href === "/dashboard/requests" && (
+              <UnreadBadge initial={unreadNotifications} />
+            )}
           </Link>
         ))}
         <button

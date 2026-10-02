@@ -3,9 +3,16 @@ import { useTranslation } from "@/components/language";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UnreadBadge } from "@/components/notifications";
 import { Home, Search, Heart, UserRound, ClipboardList } from "lucide-react";
 
-export function MobileNav({ signedIn }: { signedIn: boolean }) {
+export function MobileNav({
+  signedIn,
+  unreadNotifications = 0,
+}: {
+  signedIn: boolean;
+  unreadNotifications?: number;
+}) {
   const t = useTranslation();
 
   const pathname = usePathname();
@@ -38,6 +45,9 @@ export function MobileNav({ signedIn }: { signedIn: boolean }) {
           >
             <Icon size={21} aria-hidden="true" />
             <span>{label}</span>
+            {signedIn && href === "/dashboard" && (
+              <UnreadBadge initial={unreadNotifications} />
+            )}
           </Link>
         );
       })}

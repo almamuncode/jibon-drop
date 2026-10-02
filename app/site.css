@@ -2038,3 +2038,48 @@ html[lang="bn"] :is(h1, h2, h3) {
 .donor-contact > .button {
   margin: 0 8px 8px 0;
 }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: #c62828;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.mobile-nav a {
+  position: relative;
+}
+.mobile-nav .unread-badge {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  margin-left: 6px;
+}
+.notification-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.notification-status p {
+  margin: 0;
+}
+.new-request {
+  border-left: 4px solid #c62828;
+}

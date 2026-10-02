@@ -3,6 +3,7 @@ import { useTranslation } from "@/components/language";
 
 import Link from "next/link";
 import Image from "next/image";
+import { UnreadBadge } from "@/components/notifications";
 export function Avatar({ name, url }: { name: string; url: string | null }) {
   return (
     <div className="avatar">
@@ -30,7 +31,10 @@ export function DashboardNav() {
       <Link href="/dashboard">{t("Overview")}</Link>
       <Link href="/dashboard/profile">{t("My profile")}</Link>
       <Link href="/dashboard/donations">{t("Donation records")}</Link>
-      <Link href="/dashboard/requests">{t("Contact requests")}</Link>
+      <Link href="/dashboard/requests">
+        {t("Contact requests")}
+        <UnreadBadge />
+      </Link>
       <Link href="/dashboard/settings">{t("Settings")}</Link>
     </nav>
   );
