@@ -1,7 +1,11 @@
-import { googleConfigured } from "@/lib/auth";
+import { getAuth, googleConfigured } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AuthForm } from "@/components/auth";
-export default function Register() {
+export default async function Register() {
+  const session = await getAuth().api.getSession({ headers: await headers() });
+  if (session) redirect("/dashboard");
   return (
     <div className="container auth-shell">
       <div className="auth-card">

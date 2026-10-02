@@ -1,4 +1,6 @@
-import { googleConfigured } from "@/lib/auth";
+import { getAuth, googleConfigured } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AuthForm } from "@/components/auth";
 export default async function Login({
@@ -6,6 +8,8 @@ export default async function Login({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const session = await getAuth().api.getSession({ headers: await headers() });
+  if (session) redirect("/dashboard");
   const error = (await searchParams).error;
   return (
     <div className="container auth-shell">

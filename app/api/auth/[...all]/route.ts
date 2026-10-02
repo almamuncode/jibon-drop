@@ -53,15 +53,22 @@ async function handle(req: Request) {
     return await getAuth().handler(req);
   } catch (e) {
     const message = e instanceof Error ? e.message : "";
+    const originRejected = message === "Request origin is not allowed.";
+    const throttled = message.startsWith("Too many requests.");
+    const publicMessage = originRejected
+      ? "Sign-in is not configured for this website address. Please contact the site owner."
+      : throttled
+        ? message
+        : message.startsWith("Set ") ||
+            message.startsWith("Database is not configured")
+          ? "Account services are not configured. Please contact the site owner."
+          : "Unable to authenticate. Check your details or try again later.";
     return Response.json(
       {
-        error:
-          message.startsWith("Set ") ||
-          message.startsWith("Database is not configured")
-            ? message
-            : "Unable to authenticate. Check your details or try again later.",
+        message: publicMessage,
+        error: publicMessage,
       },
-      { status: 400 },
+      { status: originRejected ? 403 : throttled ? 429 : 400 },
     );
   }
 }

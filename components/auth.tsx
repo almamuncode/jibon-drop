@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 export function AuthForm({
   register = false,
@@ -9,7 +8,6 @@ export function AuthForm({
   register?: boolean;
   googleEnabled?: boolean;
 }) {
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   async function google() {
@@ -109,8 +107,10 @@ export function AuthForm({
                   ? result.error.message || "Unable to create account."
                   : "Invalid email, username or password.",
               );
-            router.push(register ? "/dashboard/profile" : "/dashboard");
-            router.refresh();
+            // Reload with the new session cookie and clear guest page caches.
+            window.location.replace(
+              register ? "/dashboard/profile" : "/dashboard",
+            );
           } catch (e) {
             setError((e as Error).message);
           } finally {

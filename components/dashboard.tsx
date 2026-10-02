@@ -11,7 +11,11 @@ export async function api(path: string, body: unknown, method = "POST") {
   if (!r.ok) throw new Error(data.error);
   return data;
 }
-export function AccountActions() {
+export function AccountActions({
+  showLogout = true,
+}: {
+  showLogout?: boolean;
+}) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [confirm, setConfirm] = useState("");
@@ -19,14 +23,19 @@ export function AccountActions() {
   const [busy, setBusy] = useState(false);
   async function run(path: string) {
     setBusy(true);
+    setError("");
     try {
       await api(
         path,
         path === "account" ? { confirm } : {},
         path === "account" ? "DELETE" : "POST",
       );
-      router.push("/");
-      router.refresh();
+      // Reload to discard any cached authenticated pages after deletion.
+      if (path === "account") window.location.replace("/");
+      else {
+        router.push("/");
+        router.refresh();
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -35,24 +44,39 @@ export function AccountActions() {
   }
   return (
     <div className="account-actions">
+      {showLogout && (
+        <button
+          className="button secondary"
+          disabled={busy}
+          onClick={() => run("logout")}
+        >
+          Log out
+        </button>
+      )}
       <button
-        className="button secondary"
+        className="text-button"
+        type="button"
         disabled={busy}
-        onClick={() => run("logout")}
+        aria-expanded={deleting}
+        onClick={() => {
+          setDeleting(!deleting);
+          setConfirm("");
+          setError("");
+        }}
       >
-        Log out
-      </button>
-      <button className="text-button" onClick={() => setDeleting(!deleting)}>
-        Delete account
+        {deleting ? "Cancel deletion" : "Delete my profile"}
       </button>
       {deleting && (
         <div className="notice">
           <p>
-            This deletes your profile, sessions, donations and photo. Type
-            DELETE to confirm.
+            This permanently deletes your sign-in account, donor profile,
+            donation history and photo, and logs out all devices. This cannot be
+            undone. Type DELETE to confirm.
           </p>
           <input
             aria-label="Deletion confirmation"
+            autoComplete="off"
+            disabled={busy}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
@@ -61,7 +85,7 @@ export function AccountActions() {
             disabled={confirm !== "DELETE" || busy}
             onClick={() => run("account")}
           >
-            Permanently delete account
+            {busy ? "Deleting…" : "Permanently delete my profile"}
           </button>
         </div>
       )}

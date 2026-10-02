@@ -1,5 +1,6 @@
 import { requireDonor } from "@/lib/security";
 import { ProfileEditor } from "@/components/profile-editor";
+import { AccountActions } from "@/components/dashboard";
 import { locationLabel } from "@/lib/public";
 export default async function EditProfile() {
   const d = await requireDonor();
@@ -32,6 +33,14 @@ export default async function EditProfile() {
           ]),
         }}
       />
+      <section className="dashboard-panel">
+        <h2>Delete my profile</h2>
+        <p>
+          Permanently remove your donor profile and sign-in account, including
+          your donation history and photo.
+        </p>
+        <AccountActions showLogout={false} />
+      </section>
     </div>
   );
 }
