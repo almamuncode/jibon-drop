@@ -75,17 +75,9 @@ References: [Better Auth Next.js](https://better-auth.com/docs/integrations/next
 
 When a signed-in person sends a contact request, the donor gets an in-app notification (unread badge in the account menu, mobile navigation, dashboard tabs and the requests screen) and an email through Resend. The email contains only a generic message and a link to `BETTER_AUTH_URL/dashboard/requests?request=<id>`; it never includes the message, requester, phone number or patient details. Opening that link marks the notification read. Counts refresh every 45 seconds while the page is visible and pause when it is hidden. No SMS or push is used.
 
-The request is saved even if email fails. Delivery status (`PENDING`, `SENT`, `FAILED`, `SKIPPED`), attempts and the next retry time are stored in `Notification`. Each request has one notification row, delivery is claimed atomically (no duplicate emails), failures retry with backoff (5 min, 20 min, … up to 5 attempts), and a donor receives at most 5 notification emails per hour (extra ones stay in-app as `SKIPPED`). Contact requests keep their existing per-account/IP rate limits.
+The request is saved even if email fails. Delivery status (`PENDING`, `SENT`, `FAILED`, `SKIPPED`) and the error are stored in `Notification`; a failed email is not retried automatically (no cron is used). Each request has one notification row and delivery is claimed atomically, so no duplicate emails are sent. A donor receives at most 5 notification emails per hour (extra ones stay in-app as `SKIPPED`). Contact requests keep their existing per-account/IP rate limits.
 
-Setup:
-
-1. Run `npm run db:migrate` (adds the `Notification` table).
-2. Set `RESEND_API_KEY`, `EMAIL_FROM`, `BETTER_AUTH_URL` and `CRON_SECRET` (16+ random characters).
-3. [vercel.json](vercel.json) schedules `GET /api/cron/notifications` once a day (`0 3 * * *`), the most frequent schedule Vercel Hobby allows; a more frequent expression fails the deployment there. Vercel sends `Authorization: Bearer $CRON_SECRET` automatically. On Pro you can use e.g. `*/15 * * * *`. The endpoint rejects requests without the secret. Failed emails are also attempted once right after the request, so the daily run only catches leftovers.
-
-Notifications emails fail (and are retried) while Resend is not configured. Run `npm test` for authorization, unread-count, email-failure and duplicate-prevention tests (they use an in-memory PGlite database and a mocked mailer, so no real email is sent).
-
-A declined request can be sent again by the same person 24 hours after the decline (`declineCooldown` in `lib/contact-policy.ts`); revoked requests (including admin/abuse revocations) stay closed. Run `npm run db:migrate` to backfill existing declines.
+Setup: run `npm run db:migrate`, then set `RESEND_API_KEY`, `EMAIL_FROM` (a sender on your verified Resend domain) and `BETTER_AUTH_URL`. Run `npm test` for the authorization, unread-count, email-failure and duplicate-prevention tests (in-memory PGlite and a mocked mailer; no real email is sent).
 
 ## Administration
 

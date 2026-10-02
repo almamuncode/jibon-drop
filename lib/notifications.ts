@@ -3,15 +3,10 @@ import { db } from "./db";
 import { sendAccountEmail } from "./email";
 
 export const notificationLimits = {
-  maxAttempts: 5,
+  maxAttempts: 1,
   lockSeconds: 120,
   emailsPerHour: 5,
-  retryBatch: 10,
 };
-
-export function retryDelayMs(attempts: number) {
-  return Math.min(6 * 60 * 60 * 1000, 5 * 60 * 1000 * 4 ** (attempts - 1));
-}
 
 export function requestLink(contactRequestId: string) {
   const origin = process.env.BETTER_AUTH_URL?.replace(/\/+$/, "");
@@ -89,7 +84,7 @@ export async function deliverNotification(id: string): Promise<Delivery> {
     >`
       UPDATE "Notification" SET "emailAttempts"="emailAttempts"+1,
         "emailLockedUntil"=${lockedUntil}, "updatedAt"=${now}
-      WHERE id=${id} AND "emailStatus" IN ('PENDING','FAILED')
+      WHERE id=${id} AND "emailStatus" = 'PENDING'
         AND "emailAttempts"<${notificationLimits.maxAttempts}
         AND ("emailNextAttemptAt" IS NULL OR "emailNextAttemptAt"<=${now})
         AND ("emailLockedUntil" IS NULL OR "emailLockedUntil"<=${now})
@@ -132,11 +127,6 @@ export async function deliverNotification(id: string): Promise<Delivery> {
         "We couldn’t send the notification email.",
       );
     } catch (error) {
-      const row = await client.notification.findUnique({
-        where: { id },
-        select: { emailAttempts: true },
-      });
-      const attempts = row?.emailAttempts ?? notificationLimits.maxAttempts;
       console.error("Notification email failed", id, error);
       await client.notification.update({
         where: { id },
@@ -145,10 +135,6 @@ export async function deliverNotification(id: string): Promise<Delivery> {
           emailLockedUntil: null,
           emailError:
             error instanceof Error ? error.message.slice(0, 200) : "Failed",
-          emailNextAttemptAt:
-            attempts >= notificationLimits.maxAttempts
-              ? null
-              : new Date(Date.now() + retryDelayMs(attempts)),
         },
       });
       return "failed";
@@ -168,35 +154,4 @@ export async function deliverNotification(id: string): Promise<Delivery> {
     console.error("Notification delivery unavailable", id, error);
     return "failed";
   }
-}
-
-export async function retryNotifications(
-  limit = notificationLimits.retryBatch,
-) {
-  const due = await db().notification.findMany({
-    where: {
-      emailStatus: { in: ["PENDING", "FAILED"] },
-      emailAttempts: { lt: notificationLimits.maxAttempts },
-      AND: [
-        {
-          OR: [
-            { emailNextAttemptAt: null },
-            { emailNextAttemptAt: { lte: new Date() } },
-          ],
-        },
-        {
-          OR: [
-            { emailLockedUntil: null },
-            { emailLockedUntil: { lte: new Date() } },
-          ],
-        },
-      ],
-    },
-    orderBy: { createdAt: "asc" },
-    take: limit,
-    select: { id: true },
-  });
-  const totals = { sent: 0, failed: 0, skipped: 0, unavailable: 0 };
-  for (const { id } of due) totals[await deliverNotification(id)]++;
-  return { due: due.length, ...totals };
 }

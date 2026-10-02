@@ -35,7 +35,6 @@ let lib: Lib;
 let contactRoute: typeof import("../app/api/contact/route");
 let readRoute: typeof import("../app/api/notifications/read/route");
 let countRoute: typeof import("../app/api/notifications/route");
-let cronRoute: typeof import("../app/api/cron/notifications/route");
 let client: ReturnType<typeof import("../lib/db").db>;
 let pg: PGlite;
 let server: PGLiteSocketServer;
@@ -58,13 +57,11 @@ beforeAll(async () => {
   process.env.JIBONDROP_TEST_BUILD = "1";
   process.env.AUTH_SECRET = "x".repeat(40);
   process.env.BETTER_AUTH_URL = "https://jibon.example/";
-  process.env.CRON_SECRET = "cron-secret-with-length";
   client = (await import("../lib/db")).db();
   lib = await import("../lib/notifications");
   contactRoute = await import("../app/api/contact/route");
   readRoute = await import("../app/api/notifications/read/route");
   countRoute = await import("../app/api/notifications/route");
-  cronRoute = await import("../app/api/cron/notifications/route");
 });
 afterAll(async () => {
   await client?.$disconnect();
@@ -143,28 +140,16 @@ describe("donor notifications", () => {
     const note = await client.notification.findFirstOrThrow();
     expect(note.emailStatus).toBe("FAILED");
     expect(note.emailAttempts).toBe(1);
-    expect(note.emailNextAttemptAt).not.toBeNull();
+    expect(note.emailError).toBeTruthy();
     expect(await lib.unreadCount(ids.donor)).toBe(1);
   });
 
-  it("retries failed emails once and never duplicates sent ones", async () => {
-    sendAccountEmail.mockRejectedValueOnce(new Error("temporary"));
+  it("sends each notification email at most once", async () => {
     await sendRequest();
     await flush();
     const note = await client.notification.findFirstOrThrow();
-    // Backoff blocks an immediate retry.
     expect(await lib.deliverNotification(note.id)).toBe("unavailable");
-    await client.notification.update({
-      where: { id: note.id },
-      data: { emailNextAttemptAt: new Date(Date.now() - 1000) },
-    });
-    const [a, b] = await Promise.all([
-      lib.deliverNotification(note.id),
-      lib.deliverNotification(note.id),
-    ]);
-    expect([a, b].sort()).toEqual(["sent", "unavailable"]);
-    expect(await lib.deliverNotification(note.id)).toBe("unavailable");
-    expect(sendAccountEmail).toHaveBeenCalledTimes(2);
+    expect(sendAccountEmail).toHaveBeenCalledTimes(1);
   });
 
   it("does not create or email a second notification for a repeated request", async () => {
@@ -173,24 +158,6 @@ describe("donor notifications", () => {
     await flush();
     expect(await client.notification.count()).toBe(1);
     expect(sendAccountEmail).toHaveBeenCalledTimes(1);
-  });
-
-  it("stops retrying after the attempt limit", async () => {
-    sendAccountEmail.mockRejectedValue(new Error("down"));
-    await sendRequest();
-    await flush();
-    const note = await client.notification.findFirstOrThrow();
-    for (let i = 1; i < lib.notificationLimits.maxAttempts; i++) {
-      await client.notification.update({
-        where: { id: note.id },
-        data: { emailNextAttemptAt: null },
-      });
-      await lib.deliverNotification(note.id);
-    }
-    const final = await client.notification.findFirstOrThrow();
-    expect(final.emailAttempts).toBe(lib.notificationLimits.maxAttempts);
-    expect(final.emailNextAttemptAt).toBeNull();
-    expect(await lib.retryNotifications()).toMatchObject({ due: 0 });
   });
 
   it("limits emails per recipient per hour", async () => {
@@ -264,17 +231,5 @@ describe("donor notifications", () => {
     ).not.toBeNull();
     const other = await countRoute.GET(get("/api/notifications", ids.donor));
     expect(await other.json()).toEqual({ unread: 0 });
-  });
-
-  it("protects the retry endpoint with the cron secret", async () => {
-    expect(
-      (await cronRoute.GET(get("/api/cron/notifications", null))).status,
-    ).toBe(401);
-    const response = await cronRoute.GET(
-      new Request("http://localhost/api/cron/notifications", {
-        headers: { authorization: "Bearer cron-secret-with-length" },
-      }),
-    );
-    expect(response.status).toBe(200);
   });
 });
