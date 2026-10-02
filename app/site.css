@@ -1723,6 +1723,19 @@ textarea {
   margin: 16px 0 0;
   font-size: 14px;
 }
+.delete-profile-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.delete-profile-confirmation > p {
+  margin: 0;
+}
+.delete-profile-confirmation > input {
+  width: 100%;
+  max-width: 360px;
+}
 .account-actions {
   display: flex;
   align-items: center;

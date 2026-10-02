@@ -1,5 +1,7 @@
 import { createHash, createHmac } from "node:crypto";
 import { headers } from "next/headers";
+import { cache } from "react";
+import { Prisma } from "@prisma/client";
 import { getAuth } from "./auth";
 import { db } from "./db";
 export const hash = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -9,7 +11,8 @@ export function secretHash(s: string) {
     throw new Error("Set AUTH_SECRET to at least 32 random characters.");
   return createHmac("sha256", secret).update(s).digest("hex");
 }
-export async function currentDonor() {
+// Share initialization between the dashboard layout and page in each render.
+export const currentDonor = cache(async () => {
   if (!(await headers()).get("cookie")) return null;
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) return null;
@@ -18,12 +21,26 @@ export async function currentDonor() {
     select: { suspended: true },
   });
   if (!user || user.suspended) return null;
-  return db().donor.upsert({
-    where: { userId: session.user.id },
-    create: { userId: session.user.id, name: session.user.name },
-    update: {},
-  });
-}
+  try {
+    return await db().donor.upsert({
+      where: { userId: session.user.id },
+      create: { userId: session.user.id, name: session.user.name },
+      update: {},
+    });
+  } catch (error) {
+    // Another request may create this user's profile during the same sign-in.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      const donor = await db().donor.findUnique({
+        where: { userId: session.user.id },
+      });
+      if (donor) return donor;
+    }
+    throw error;
+  }
+});
 export async function requireDonor() {
   const donor = await currentDonor();
   if (!donor) throw new Error("Please log in to continue.");

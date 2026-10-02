@@ -67,7 +67,7 @@ export function AccountActions({
         {deleting ? "Cancel deletion" : "Delete my profile"}
       </button>
       {deleting && (
-        <div className="notice">
+        <div className="notice delete-profile-confirmation">
           <p>
             This permanently deletes your sign-in account, donor profile,
             donation history and photo, and logs out all devices. This cannot be
