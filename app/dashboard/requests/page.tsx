@@ -44,15 +44,12 @@ export default async function RequestsPage({
     expiresAt: true,
     requester: { select: { name: true } },
   } as const;
-  const [receivedPageRows, sent, receivedTotal, sentTotal, openedRow] =
+  const [pendingTotal, receivedTotal, sent, sentTotal, openedRow] =
     await Promise.all([
-      db().contactRequest.findMany({
-        where: { donorId: donor.id },
-        orderBy: { updatedAt: "desc" },
-        take: pageSize,
-        skip: (receivedPage - 1) * pageSize,
-        select: receivedSelect,
+      db().contactRequest.count({
+        where: { donorId: donor.id, status: "PENDING" },
       }),
+      db().contactRequest.count({ where: { donorId: donor.id } }),
       db().contactRequest.findMany({
         where: { requesterId: donor.userId! },
         orderBy: { updatedAt: "desc" },
@@ -67,7 +64,6 @@ export default async function RequestsPage({
           donor: { select: { name: true, publicId: true } },
         },
       }),
-      db().contactRequest.count({ where: { donorId: donor.id } }),
       db().contactRequest.count({ where: { requesterId: donor.userId! } }),
       opened
         ? db().contactRequest.findFirst({
@@ -76,6 +72,30 @@ export default async function RequestsPage({
           })
         : null,
     ]);
+  const receivedOffset = (receivedPage - 1) * pageSize;
+  const pendingRows = await db().contactRequest.findMany({
+    where: { donorId: donor.id, status: "PENDING" },
+    orderBy: { updatedAt: "desc" },
+    take: Math.min(
+      pageSize,
+      Math.max(0, pendingTotal - receivedOffset),
+    ),
+    skip: Math.min(receivedOffset, pendingTotal),
+    select: receivedSelect,
+  });
+  const receivedPageRows =
+    pendingRows.length === pageSize
+      ? pendingRows
+      : [
+          ...pendingRows,
+          ...(await db().contactRequest.findMany({
+            where: { donorId: donor.id, status: { not: "PENDING" } },
+            orderBy: { updatedAt: "desc" },
+            take: pageSize - pendingRows.length,
+            skip: Math.max(0, receivedOffset - pendingTotal),
+            select: receivedSelect,
+          })),
+        ];
   const received = openedRow
     ? [openedRow, ...receivedPageRows.filter((r) => r.id !== openedRow.id)]
     : receivedPageRows;
