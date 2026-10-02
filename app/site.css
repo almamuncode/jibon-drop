@@ -1992,3 +1992,49 @@ html[lang="bn"] :is(h1, h2, h3) {
     height: 32px;
   }
 }
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 16px;
+}
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--input-line);
+  border-radius: 12px;
+  background: var(--subtle);
+  color: var(--dark);
+  resize: vertical;
+}
+.contact-form .button {
+  align-self: flex-start;
+}
+.contact-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.request-list {
+  margin-top: 32px;
+}
+.request-message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.report-abuse {
+  margin-top: 12px;
+}
+.donor-contact {
+  margin-top: 12px;
+}
+.donor-contact > .button {
+  margin: 0 8px 8px 0;
+}

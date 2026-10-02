@@ -106,8 +106,8 @@ async function main() {
   ])
     assert.ok(!search.includes(privateValue));
   assert.equal(
-    (await call("contact", { publicId: donor.publicId })).data.phone,
-    "+8801712345678",
+    (await call("contact", { publicId: donor.publicId })).response.status,
+    401,
   );
   // Respect Better Auth’s short-window registration throttle.
   await new Promise((resolve) => setTimeout(resolve, 11000));
@@ -118,6 +118,38 @@ async function main() {
     password,
   });
   assert.equal(second.response.status, 200);
+  const request = await call(
+    "contact",
+    {
+      publicId: donor.publicId,
+      message: "Need A+ blood at the local hospital today.",
+    },
+    second.cookie,
+  );
+  assert.equal(request.response.status, 200);
+  assert.equal(request.data.status, "PENDING");
+  assert.equal(request.data.phone, undefined);
+  assert.equal(
+    (
+      await call(
+        "contact-requests",
+        { id: request.data.id, action: "approve" },
+        cookie,
+      )
+    ).response.status,
+    200,
+  );
+  assert.equal(
+    (
+      await call(
+        "contact",
+        { publicId: donor.publicId, intent: "reveal" },
+        second.cookie,
+      )
+    ).data.phone,
+    "+8801712345678",
+  );
+
   const submissionId = crypto.randomUUID();
   assert.equal(
     (
@@ -174,7 +206,8 @@ async function main() {
   );
   await call("profile", { ...profile, visible: false, consent: false }, cookie);
   assert.equal(
-    (await call("contact", { publicId: donor.publicId })).response.status,
+    (await call("contact", { publicId: donor.publicId }, second.cookie))
+      .response.status,
     404,
   );
   assert.equal((await fetch(base + "/donors/" + donor.publicId)).status, 404);

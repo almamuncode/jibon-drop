@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState } from "react";
 import { type Locale, translator } from "@/lib/i18n";
-const LanguageContext = createContext<Locale>("bn");
+const LanguageContext = createContext<Locale>("en");
 export function LanguageProvider({
   locale,
   children,

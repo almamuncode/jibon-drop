@@ -66,8 +66,16 @@ export async function POST(request: Request) {
             where: { id: user.id },
             data: { suspended: body.action === "suspend" },
           });
-          if (body.action === "suspend")
+          if (body.action === "suspend") {
             await tx.session.deleteMany({ where: { userId: user.id } });
+            await tx.contactRequest.updateMany({
+              where: {
+                status: "APPROVED",
+                OR: [{ requesterId: user.id }, { donor: { userId: user.id } }],
+              },
+              data: { status: "REVOKED", phoneHash: null, expiresAt: null },
+            });
+          }
           break;
         case "hide":
         case "restore":
@@ -76,6 +84,11 @@ export async function POST(request: Request) {
             where: { id: user.donor.id },
             data: { moderationBlocked: body.action === "hide" },
           });
+          if (body.action === "hide")
+            await tx.contactRequest.updateMany({
+              where: { donorId: user.donor.id, status: "APPROVED" },
+              data: { status: "REVOKED", phoneHash: null, expiresAt: null },
+            });
           break;
         case "delete-donation": {
           if (!user.donor || !body.donationId)

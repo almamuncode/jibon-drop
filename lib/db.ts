@@ -7,6 +7,10 @@ export function db() {
       "Database is not configured. Set DATABASE_URL and run migrations and the location seed.",
     );
   return (globalDb.db ??= new PrismaClient({
-    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+    adapter: new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+      // The isolated PGlite socket fixture shares one PostgreSQL backend.
+      ...(process.env.JIBONDROP_TEST_BUILD === "1" ? { max: 1 } : {}),
+    }),
   }));
 }

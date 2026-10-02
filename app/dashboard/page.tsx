@@ -12,7 +12,7 @@ export default async function Dashboard() {
   const locale = await getLocale();
 
   const d = await requireDonor();
-  const [location, records] = await Promise.all([
+  const [location, records, pendingRequests] = await Promise.all([
     locationLabel([d.divisionId, d.districtId, d.localityId, d.areaId], locale),
     db().donation.findMany({
       where: { donorId: d.id },
@@ -20,6 +20,7 @@ export default async function Dashboard() {
       take: 3,
       select: { id: true, date: true, hospital: true },
     }),
+    db().contactRequest.count({ where: { donorId: d.id, status: "PENDING" } }),
   ]);
   return (
     <>
@@ -35,6 +36,17 @@ export default async function Dashboard() {
           )}{" "}
         </p>
       </div>
+      {pendingRequests > 0 && (
+        <div className="notice">
+          <p>
+            {t("People are waiting for your contact approval.")} (
+            {pendingRequests})
+          </p>
+          <Link className="text-link" href="/dashboard/requests">
+            {t("Review contact requests")}
+          </Link>
+        </div>
+      )}
       <section className="donor-welcome">
         <div className="profile-identity">
           <Avatar name={d.name} url={d.imageUrl} />

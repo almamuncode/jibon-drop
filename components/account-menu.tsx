@@ -19,11 +19,13 @@ export function AccountMenu({
   email,
   image,
   isAdmin = false,
+  pendingRequests = 0,
 }: {
   name: string;
   email: string;
   image: string | null;
   isAdmin?: boolean;
+  pendingRequests?: number;
 }) {
   const t = useTranslation();
 
@@ -74,6 +76,13 @@ export function AccountMenu({
           {
             href: "/dashboard/profile",
             label: t("My profile"),
+            icon: UserRound,
+          },
+          {
+            href: "/dashboard/requests",
+            label:
+              t("Contact requests") +
+              (pendingRequests ? ` (${pendingRequests})` : ""),
             icon: UserRound,
           },
           { href: "/dashboard/settings", label: t("Settings"), icon: Settings },

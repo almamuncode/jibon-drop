@@ -39,10 +39,11 @@ export const profileSchema = z
     fallbackArea: z.string().trim().max(120).nullable(),
     available: z.boolean(),
     visible: z.boolean(),
+    sharePhone: z.boolean().optional(),
     consent: z.boolean(),
   })
   .refine((v) => !v.visible || v.consent, {
-    message: "Contact-sharing consent is required for a public listing.",
+    message: "Public profile consent is required for a public listing.",
     path: ["consent"],
   });
 export function dhakaToday(now = new Date()) {

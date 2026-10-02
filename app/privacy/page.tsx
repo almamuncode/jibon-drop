@@ -7,13 +7,13 @@ export default async function Privacy() {
       <h1>{t("Privacy & respectful contact")}</h1>
       <p>
         {t(
-          "JibonDrop connects people with donors who consent to a public listing and contact-number sharing. Search is free and does not require an account.",
+          "JibonDrop connects people with donors who consent to a public listing. Search is free without an account. Contact requests require login and donor approval.",
         )}{" "}
       </p>
       <h2>{t("What is public?")}</h2>
       <p>
         {t(
-          "Your name, blood group, administrative location, optional photo, willingness to donate, recorded donation count and last donation date. Your number is returned only through the contact action. Anyone may use that action, subject to rate limits.",
+          "Your name, blood group, administrative location, optional photo, willingness to donate, recorded donation count and last donation date. Your number is shared only with a signed-in person you approve, for 24 hours. Requests and reveals have account and IP limits.",
         )}{" "}
       </p>
       <h2>{t("You stay in control")}</h2>
@@ -25,7 +25,7 @@ export default async function Privacy() {
       <h2>{t("Private information")}</h2>
       <p>
         {t(
-          "Hospital names, notes and free-text area fallback remain private. Do not enter patient identity or medical records. Email, account credentials and session records are never public.",
+          "Hospital names, notes and free-text area fallback remain private. Do not enter patient identity or medical records. Email, account credentials and session records are never public. Contact-request messages are visible only to the sender and donor. Abuse reports are available to administrators.",
         )}{" "}
       </p>
       <h2>{t("Contact with care")}</h2>

@@ -1,7 +1,7 @@
 import { bangla } from "./translations";
 export type Locale = "bn" | "en";
 export function normalizeLocale(value?: string): Locale {
-  return value === "en" ? "en" : "bn";
+  return value === "bn" ? "bn" : "en";
 }
 export function translator(locale: Locale) {
   const t = (text: string) => (locale === "bn" ? (bangla[text] ?? text) : text);

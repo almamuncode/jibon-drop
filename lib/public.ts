@@ -25,7 +25,7 @@ export const published = {
 };
 export async function locationLabel(
   ids: (string | null)[],
-  locale: Locale = "bn",
+  locale: Locale = "en",
 ) {
   const records = await db().location.findMany({
     where: { id: { in: ids.filter((id): id is string => !!id) } },

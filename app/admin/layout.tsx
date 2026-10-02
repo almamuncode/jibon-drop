@@ -15,6 +15,7 @@ export default async function AdminLayout({
     <div className="container">
       <nav className="dashboard-nav" aria-label={t("Administration")}>
         <Link href="/admin">{t("Users")}</Link>
+        <Link href="/admin/reports">{t("Abuse reports")}</Link>
         <Link href="/admin/audit">{t("Activity log")}</Link>
         <Link href="/dashboard">{t("My dashboard")}</Link>
       </nav>

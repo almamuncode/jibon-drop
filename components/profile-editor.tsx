@@ -17,6 +17,7 @@ type Profile = {
   areaId: string | null;
   fallbackArea: string | null;
   visible: boolean;
+  sharePhone: boolean;
   available: boolean;
   consent: boolean;
   hasPhoto: boolean;
@@ -60,11 +61,15 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             <dd>{p.available ? t("Willing to donate") : t("Unavailable")}</dd>
           </div>
           <div>
+            <dt>{t("Phone sharing")}</dt>
+            <dd>{p.sharePhone ? t("Only with my approval") : t("Disabled")}</dd>
+          </div>
+          <div>
             <dt>{t("Directory listing")}</dt>
             <dd>{p.visible && p.consent ? t("Public") : t("Private")}</dd>
           </div>
           <div>
-            <dt>{t("Contact-sharing consent")}</dt>
+            <dt>{t("Public profile consent")}</dt>
             <dd>{p.consent ? t("Given") : t("Not given")}</dd>
           </div>
         </dl>
@@ -107,6 +112,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
               fallbackArea: f.get("fallbackArea") || null,
               available: f.get("available") === "on",
               visible: f.get("visible") === "on",
+              sharePhone: f.get("sharePhone") === "on",
               consent: f.get("consent") === "on",
             });
             setMessage(t("Profile saved."));
@@ -191,9 +197,24 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             aria-describedby="listing-consent-help"
           />
           {t(
-            "I consent to a public donor profile and to sharing my mobile number through the contact action.",
+            "I consent to a public donor profile. My number is shared only with people I approve.",
           )}{" "}
         </label>
+        <label className="check">
+          <input
+            name="sharePhone"
+            type="checkbox"
+            defaultChecked={p.sharePhone}
+          />
+          {t(
+            "Accept contact requests and share my number only after I approve.",
+          )}
+        </label>
+        <p className="muted">
+          {t(
+            "Turning this off revokes approved access. Your directory listing can stay visible.",
+          )}
+        </p>
         <label className="check">
           <input
             name="visible"
@@ -208,7 +229,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             "To publish your listing, check the contact-sharing consent box above. You can save a private profile by leaving the listing option off.",
           )}{" "}
           {t(
-            "Anyone can search and contact listed donors. Withdraw consent or hide your listing at any time.",
+            "Anyone can search listed donors. Only signed-in people can request contact, and you approve each request. Withdraw consent or hide your listing at any time.",
           )}{" "}
         </p>
         <button className="button" disabled={busy}>

@@ -19,6 +19,14 @@ async function main() {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto(base);
+    assert.equal(await page.locator("html").getAttribute("lang"), "en");
+    await page
+      .getByRole("heading", {
+        name: "A little of you. A lifeline for someone.",
+      })
+      .waitFor();
+    await page.getByRole("button", { name: "BN", exact: true }).click();
+    await page.waitForFunction(() => document.documentElement.lang === "bn");
     await page
       .getByRole("heading", {
         name: "আপনার সামান্য দান। কারও বেঁচে থাকার আশা।",
@@ -140,7 +148,7 @@ async function main() {
     });
     assert.deepEqual(errors, []);
     console.log(
-      "PASS: default Bangla; BN/EN switching and persistence; Bangla registration and profile save; single-language locations; deletion spacing; mobile bounds; no browser errors.",
+      "PASS: default English; BN/EN switching and persistence; Bangla registration and profile save; single-language locations; deletion spacing; mobile bounds; no browser errors.",
     );
   } finally {
     await browser.close();

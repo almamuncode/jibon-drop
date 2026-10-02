@@ -25,6 +25,7 @@ export default async function EditProfile() {
           fallbackArea: d.fallbackArea,
           available: d.available,
           visible: d.visible,
+          sharePhone: d.sharePhone,
           consent: !!d.consentAt,
           hasPhoto: !!d.imageUrl,
           phone: d.phone || "",

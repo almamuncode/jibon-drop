@@ -61,7 +61,7 @@ export default async function Home() {
               icon: Phone,
               title: t("Connect with a donor"),
               text: t(
-                "View their profile and reveal their number with their consent.",
+                "View their profile and send a contact request. Their number is shared only after approval.",
               ),
             },
             {

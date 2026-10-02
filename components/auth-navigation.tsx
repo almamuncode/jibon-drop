@@ -38,11 +38,16 @@ export async function AuthNavigation() {
   });
   const donor = await db().donor.findUnique({
     where: { userId: session.user.id },
-    select: { name: true, imageUrl: true },
+    select: {
+      name: true,
+      imageUrl: true,
+      _count: { select: { contactRequests: { where: { status: "PENDING" } } } },
+    },
   });
   return (
     <AccountMenu
       isAdmin={user?.role === "ADMIN"}
+      pendingRequests={donor?._count.contactRequests || 0}
       name={donor?.name || session.user.name}
       email={session.user.email}
       image={donor?.imageUrl || session.user.image || null}

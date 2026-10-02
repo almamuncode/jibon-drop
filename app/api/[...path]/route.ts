@@ -16,7 +16,7 @@ import {
   normalizePhone,
   profileSchema,
 } from "@/lib/validation";
-import { published, validateHierarchy } from "@/lib/public";
+import { validateHierarchy } from "@/lib/public";
 import { validateImage } from "@/lib/image";
 export const dynamic = "force-dynamic";
 async function cleanup(url: string) {
@@ -51,7 +51,6 @@ async function handle(
     }
     checkOrigin(req);
     const methods: Record<string, string[]> = {
-      contact: ["POST"],
       logout: ["POST"],
       profile: ["POST"],
       status: ["PATCH"],
@@ -64,20 +63,6 @@ async function handle(
         { error: "Method not allowed" },
         { status: 405 },
       );
-    if (action === "contact") {
-      const body = await req.json();
-      await rateLimit("contact:" + requestIp(req), 20, 3600);
-      const donor = await db().donor.findFirst({
-        where: { ...published, publicId: String(body.publicId) },
-        select: { phone: true },
-      });
-      if (!donor)
-        return NextResponse.json(
-          { error: "Contact unavailable." },
-          { status: 404 },
-        );
-      return NextResponse.json(donor);
-    }
     const donor = await requireDonor();
     if (action === "logout")
       return getAuth().api.signOut({
@@ -91,14 +76,30 @@ async function handle(
         typeof body.visible !== "boolean"
       )
         throw new Error("Invalid status.");
-      if (
-        body.visible &&
-        (!donor.consentAt || !donor.name || !donor.bloodGroup || !donor.phone)
-      )
-        throw new Error("Complete your profile and consent before publishing.");
-      await db().donor.update({
-        where: { id: donor.id },
-        data: { available: body.available, visible: body.visible },
+      await db().$transaction(async (tx) => {
+        await tx.$executeRaw`SELECT id FROM "Donor" WHERE id=${donor.id} FOR UPDATE`;
+        const current = await tx.donor.findUniqueOrThrow({
+          where: { id: donor.id },
+        });
+        if (
+          body.visible &&
+          (!current.consentAt ||
+            !current.name ||
+            !current.bloodGroup ||
+            !current.phone)
+        )
+          throw new Error(
+            "Complete your profile and consent before publishing.",
+          );
+        await tx.donor.update({
+          where: { id: donor.id },
+          data: { available: body.available, visible: body.visible },
+        });
+        if (!body.visible)
+          await tx.contactRequest.updateMany({
+            where: { donorId: donor.id, status: "APPROVED" },
+            data: { status: "REVOKED", phoneHash: null, expiresAt: null },
+          });
       });
       return NextResponse.json({ ok: true });
     }
@@ -112,15 +113,33 @@ async function handle(
       const { consent, ...data } = parsed;
       const canonical = normalizePhone(parsed.phone);
       if (!donor.userId) throw new Error("Please log in again.");
-      await db().donor.update({
-        where: { id: donor.id },
-        data: {
-          ...data,
-          phone: canonical,
-          phoneVerifiedAt:
-            donor.phone === canonical ? donor.phoneVerifiedAt : null,
-          consentAt: consent ? donor.consentAt || new Date() : null,
-        },
+      await db().$transaction(async (tx) => {
+        await tx.$executeRaw`SELECT id FROM "Donor" WHERE id=${donor.id} FOR UPDATE`;
+        const current = await tx.donor.findUniqueOrThrow({
+          where: { id: donor.id },
+        });
+        const sharePhone = parsed.sharePhone ?? current.sharePhone;
+        await tx.donor.update({
+          where: { id: donor.id },
+          data: {
+            ...data,
+            sharePhone,
+            phone: canonical,
+            phoneVerifiedAt:
+              current.phone === canonical ? current.phoneVerifiedAt : null,
+            consentAt: consent ? current.consentAt || new Date() : null,
+          },
+        });
+        if (
+          !sharePhone ||
+          !consent ||
+          !parsed.visible ||
+          current.phone !== canonical
+        )
+          await tx.contactRequest.updateMany({
+            where: { donorId: donor.id, status: "APPROVED" },
+            data: { status: "REVOKED", phoneHash: null, expiresAt: null },
+          });
       });
       return NextResponse.json({ ok: true });
     }

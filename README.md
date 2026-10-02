@@ -2,7 +2,7 @@
 
 A drop of blood. A gift of life.
 
-A Next.js / TypeScript donor directory with PostgreSQL (Neon-compatible), Prisma, Tailwind, Better Auth, Zod and Vercel Blob. Public search and contact actions require no account. Donors sign in using **Google**, or **email/username and password**. SMS is no longer used.
+A Next.js / TypeScript donor directory with PostgreSQL (Neon-compatible), Prisma, Tailwind, Better Auth, Zod and Vercel Blob. Public search requires no account. Contact requests and phone-number access require login and donor approval. Donors sign in using **Google**, or **email/username and password**. SMS is no longer used.
 
 ## Local setup
 
@@ -38,9 +38,9 @@ SMS_PROVIDER, ENABLE_DEV_OTP and TWILIO_* variables may be removed. The applicat
 
 ## Security and privacy
 
-Better Auth handles Google OAuth/state/PKCE, password hashing and HttpOnly session cookies (Secure in production, SameSite protections). Sessions persist in PostgreSQL and expire after 30 days. Authorization uses current database sessions; no client claims or cached session can authorize donor mutations. Persistent HMAC-keyed PostgreSQL limits protect login by account/IP and anonymous contact. Vercel IP extraction trusts its platform header; on other platforms implement a trusted proxy IP source (otherwise the conservative shared local bucket applies). Same-origin checks protect donor mutations. Set APP_ORIGIN to a fixed origin if needed.
+Better Auth handles Google OAuth/state/PKCE, password hashing and HttpOnly session cookies (Secure in production, SameSite protections). Sessions persist in PostgreSQL and expire after 30 days. Authorization uses current database sessions; no client claims or cached session can authorize donor mutations. Persistent HMAC-keyed PostgreSQL limits protect login by account/IP and contact requests/reveals. Vercel IP extraction trusts its platform header; on other platforms implement a trusted proxy IP source (otherwise the conservative shared local bucket applies). Same-origin checks protect donor mutations. Set APP_ORIGIN to a fixed origin if needed.
 
-Email, username, auth accounts and passwords are never in the public donor projection. Numbers are revealed only after checking current consent/visibility and contact limits. Availability and donation records are self-reported; they do not establish medical clearance. Donation totals are recomputed transactionally from owned records; dates are calendar dates and displayed in Asia/Dhaka.
+Email, username, auth accounts and passwords are never in the public donor projection. Numbers are revealed only to the approved requester after checking current consent, visibility, phone-sharing settings, phone identity, approval expiration and contact limits. Availability and donation records are self-reported; they do not establish medical clearance. Donation totals are recomputed transactionally from owned records; dates are calendar dates and displayed in Asia/Dhaka.
 
 ## Photos and cleanup
 
@@ -67,7 +67,7 @@ For isolated integration testing, run `node --import tsx scripts/test-db.ts` in 
 
 Configure DATABASE_URL, AUTH_SECRET, BETTER_AUTH_URL, GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET (if enabling Google), and BLOB_READ_WRITE_TOKEN. Use a Neon pooled URL for application traffic and an appropriate direct migration connection for schema changes. Apply migrations and seed before serving traffic. Use Node 24 and `npm run build`; do not seed in every build. Add the production Google redirect URI. Run actual Neon/Google/Blob smoke checks before launch. This task does not deploy publicly.
 
-Remaining external setup: database migrations/credentials, Google OAuth registration, optional Blob configuration, scheduled cleanup. Google OAuth was implemented but needs real credentials to verify a live Google callback. Manual sign-up/login has no SMS charge. The interface defaults to Bangla. The BN/EN switch beside the theme control saves the selected language for one year in a SameSite cookie. Pages, forms, navigation, dates and location labels use the selected language; names and other user-entered content are preserved. Shared translations are in `lib/translations.ts`. Run `node --import tsx scripts/i18n-integration.ts` against the isolated test app to verify switching, persistence and Bangla registration/profile editing.
+Remaining external setup: database migrations/credentials, Google OAuth registration, optional Blob configuration, scheduled cleanup. Google OAuth was implemented but needs real credentials to verify a live Google callback. Manual sign-up/login has no SMS charge. The interface defaults to English. The BN/EN switch beside the theme control saves the selected language for one year in a SameSite cookie. Pages, forms, navigation, dates and location labels use the selected language; names and other user-entered content are preserved. Shared translations are in `lib/translations.ts`. Run `node --import tsx scripts/i18n-integration.ts` against the isolated test app to verify switching, persistence and Bangla registration/profile editing.
 
 References: [Better Auth Next.js](https://better-auth.com/docs/integrations/next), [Google](https://better-auth.com/docs/authentication/google), [email/password](https://better-auth.com/docs/authentication/email-password), [username plugin](https://better-auth.com/docs/plugins/username).
 
@@ -80,3 +80,11 @@ npm run admin:grant -- your-account@example.com
 ```
 
 Open `/admin` or choose Administration in the avatar menu. Administrators can search accounts, inspect donor details and recent donation records, block/restore listings, suspend/reactivate accounts, grant/remove admin roles, and remove incorrect donation records. Every change requires a reason and is recorded in `/admin/audit`. Suspension revokes all sessions and prevents new sign-ins. Listing blocks remain effective even if the donor edits their visibility. Restoring a listing does not override the donor’s consent or privacy choices. Administrators cannot suspend themselves or remove their own role. Password hashes, session tokens and OAuth credentials are never displayed.
+
+## Donor phone privacy
+
+Apply `npm run db:migrate` before deploying the contact-privacy update; it adds `ContactRequest`, `AbuseReport`, and `Donor.sharePhone` without changing existing phone numbers. Search remains public. A signed-in visitor sends a 10–500 character request. Donors review requests at `/dashboard/requests`; pending counts appear in the account menu and dashboard. Approvals last 24 hours and authorize only that requester. Phone sharing can be disabled while keeping the directory listing visible. Hiding the profile, withdrawing consent, changing the phone, disabling sharing, moderation blocks, or suspension revoke existing approvals. Declined/revoked requests cannot be repeatedly resubmitted; expired approvals can be requested again.
+
+Contact requests and reveals share persistent caps: 10/hour and 25 per 24 hours per account; 20/hour and 50 per 24 hours per IP. On Vercel the platform IP header is used; other hosts use the shared local bucket until a trusted proxy source is configured. Request status reads do not disclose phone numbers. Approvals cannot erase a number someone has already seen or copied.
+
+Both parties can report abuse associated with their request; reporting revokes contact access. Admins review open reports at `/admin/reports`, manage the reported account, and resolve reports with an audited reason. Reports are limited to 5/account and 20/IP per 24 hours. Notifications are shown inside the dashboard, not sent by email. Run `AUTH_SECRET=<isolated-app-secret> node --import tsx scripts/contact-integration.ts` against the isolated local app/database for authorization, expiry, revocation, limit, reporting and Bangla browser checks.

@@ -30,6 +30,7 @@ export function DashboardNav() {
       <Link href="/dashboard">{t("Overview")}</Link>
       <Link href="/dashboard/profile">{t("My profile")}</Link>
       <Link href="/dashboard/donations">{t("Donation records")}</Link>
+      <Link href="/dashboard/requests">{t("Contact requests")}</Link>
       <Link href="/dashboard/settings">{t("Settings")}</Link>
     </nav>
   );

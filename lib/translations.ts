@@ -1,4 +1,113 @@
 export const bangla: Record<string, string> = {
+  "Public profile consent": "প্রোফাইল প্রকাশের সম্মতি",
+  "Public profile consent is required for a public listing.":
+    "তালিকায় প্রকাশ করতে প্রোফাইল প্রকাশের সম্মতি প্রয়োজন।",
+  "Log in to request donor contact.":
+    "রক্তদাতার সঙ্গে যোগাযোগের অনুরোধ করতে লগইন করুন।",
+  "Contact access is unavailable.": "যোগাযোগের অনুমতি পাওয়া যাচ্ছে না।",
+  "Check the request details and try again.":
+    "অনুরোধের তথ্য যাচাই করে আবার চেষ্টা করুন।",
+  "Contact service is unavailable. Please try again later.":
+    "যোগাযোগের সেবা পাওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।",
+  "This donor is not accepting contact requests.":
+    "এই রক্তদাতা বর্তমানে যোগাযোগের অনুরোধ নিচ্ছেন না।",
+  "This is your own donor profile.": "এটি আপনার নিজের রক্তদাতা প্রোফাইল।",
+  "The donor must approve your request before you can see the number.":
+    "নম্বর দেখার আগে রক্তদাতাকে আপনার অনুরোধ অনুমোদন করতে হবে।",
+  "Explain your request in 10–500 characters.":
+    "১০–৫০০টি অক্ষরে অনুরোধের কারণ লিখুন।",
+  "Request unavailable.": "অনুরোধ পাওয়া যাচ্ছে না।",
+  "This request has already been reviewed.":
+    "এই অনুরোধ আগেই পর্যালোচনা করা হয়েছে।",
+  "Enable phone sharing on your published profile before approving.":
+    "অনুমোদনের আগে প্রকাশিত প্রোফাইলে ফোন নম্বর শেয়ার করার অপশন চালু করুন।",
+  "Report unavailable.": "অভিযোগ পাওয়া যাচ্ছে না।",
+  "This report has already been reviewed.":
+    "এই অভিযোগ আগেই পর্যালোচনা করা হয়েছে।",
+  "Accept contact requests and share my number only after I approve.":
+    "যোগাযোগের অনুরোধ গ্রহণ করুন এবং আমার অনুমোদনের পরেই নম্বর দিন।",
+  "Turning this off revokes approved access. Your directory listing can stay visible.":
+    "এটি বন্ধ করলে আগের অনুমতি প্রত্যাহার হবে। তালিকায় প্রোফাইল প্রকাশিত রাখতে পারবেন।",
+  "I consent to a public donor profile. My number is shared only with people I approve.":
+    "আমি রক্তদাতা প্রোফাইল প্রকাশে সম্মতি দিচ্ছি। শুধু আমার অনুমোদিত ব্যক্তিদের নম্বর দেওয়া হবে।",
+  "Anyone can search listed donors. Only signed-in people can request contact, and you approve each request. Withdraw consent or hide your listing at any time.":
+    "যে কেউ তালিকার রক্তদাতাদের খুঁজতে পারেন। শুধু লগইন করা ব্যক্তিরা যোগাযোগের অনুরোধ করতে পারেন, আর প্রতিটি অনুরোধ আপনি অনুমোদন করবেন। যেকোনো সময় সম্মতি প্রত্যাহার বা প্রোফাইল আড়াল করুন।",
+  "Phone sharing": "ফোন নম্বর শেয়ার",
+  "Only with my approval": "শুধু আমার অনুমোদনে",
+  Disabled: "বন্ধ",
+  "Cancel report": "অভিযোগ বাতিল",
+  "Report abuse": "অপব্যবহারের অভিযোগ",
+  "Report sent to administrators. Contact access has been revoked.":
+    "অভিযোগ প্রশাসকদের কাছে পাঠানো হয়েছে। যোগাযোগের অনুমতি প্রত্যাহার করা হয়েছে।",
+  "Unwanted contact": "অনাকাঙ্ক্ষিত যোগাযোগ",
+  Spam: "স্প্যাম",
+  "Inappropriate behavior": "অসঙ্গত আচরণ",
+  "Describe what happened": "কী হয়েছে লিখুন",
+  "Do not include phone numbers, patient identities or medical records. Administrators can review this report.":
+    "ফোন নম্বর, রোগীর পরিচয় বা চিকিৎসার তথ্য দেবেন না। প্রশাসকেরা এই অভিযোগ দেখতে পারবেন।",
+  "Send report": "অভিযোগ পাঠান",
+  "Request sent. The donor will review it in their dashboard.":
+    "অনুরোধ পাঠানো হয়েছে। রক্তদাতা ড্যাশবোর্ডে এটি পর্যালোচনা করবেন।",
+  "Log in to request contact": "যোগাযোগের অনুরোধ করতে লগইন করুন",
+  "Request donor contact": "রক্তদাতার সঙ্গে যোগাযোগের অনুরোধ",
+  "Approval expired. Send a new request for the donor to review.":
+    "অনুমতির মেয়াদ শেষ। রক্তদাতার পর্যালোচনার জন্য নতুন অনুরোধ পাঠান।",
+  "Why do you need to contact this donor?":
+    "কেন এই রক্তদাতার সঙ্গে যোগাযোগ করতে চান?",
+  "Explain the blood group, hospital and timing. Do not include patient names or medical records.":
+    "রক্তের গ্রুপ, হাসপাতাল ও সময় জানান। রোগীর নাম বা চিকিৎসার তথ্য দেবেন না।",
+  "Send contact request": "যোগাযোগের অনুরোধ পাঠান",
+  "Waiting for the donor’s approval. Their number stays private.":
+    "রক্তদাতার অনুমোদনের অপেক্ষায়। তাঁর নম্বর ব্যক্তিগত থাকছে।",
+  "Check request status": "অনুরোধের অবস্থা দেখুন",
+  "The donor approved your request. Access expires after 24 hours.":
+    "রক্তদাতা আপনার অনুরোধ অনুমোদন করেছেন। অনুমতি ২৪ ঘণ্টা পর শেষ হবে।",
+  "View phone number": "ফোন নম্বর দেখুন",
+  "The donor declined or revoked this request. Please respect their decision.":
+    "এই অনুরোধ প্রত্যাখ্যাত হয়েছে বা অনুমতি প্রত্যাহার করা হয়েছে। যোগাযোগের সিদ্ধান্তকে সম্মান করুন।",
+  "Approve for 24 hours": "২৪ ঘণ্টার জন্য অনুমোদন",
+  "Decline request": "অনুরোধ প্রত্যাখ্যান",
+  "Revoke access": "অনুমতি প্রত্যাহার",
+  "Review note": "পর্যালোচনার নোট",
+  "Mark reviewed": "পর্যালোচিত হিসেবে চিহ্নিত করুন",
+  "Contact requests": "যোগাযোগের অনুরোধ",
+  "Your number stays private until you approve a signed-in person. Approval lasts 24 hours.":
+    "লগইন করা ব্যক্তিকে অনুমোদন না দেওয়া পর্যন্ত নম্বর ব্যক্তিগত থাকবে। অনুমতি ২৪ ঘণ্টা কার্যকর থাকে।",
+  "You can decline or revoke access at any time. Revoking access prevents future reveals, but cannot erase a number someone has already seen.":
+    "যেকোনো সময় অনুরোধ প্রত্যাখ্যান বা অনুমতি প্রত্যাহার করতে পারবেন। প্রত্যাহারের পর নতুন করে নম্বর দেখা যাবে না, তবে কেউ আগে দেখে ফেললে তা মুছে দেওয়া সম্ভব নয়।",
+  "Manage phone sharing": "ফোন নম্বর শেয়ার পরিচালনা",
+  "Received requests": "আসা অনুরোধ",
+  "Sent requests": "পাঠানো অনুরোধ",
+  "No contact requests yet.": "এখনও যোগাযোগের অনুরোধ আসেনি।",
+  "View approved contact": "অনুমোদিত যোগাযোগ দেখুন",
+  "You haven’t sent any contact requests.":
+    "আপনি এখনও যোগাযোগের অনুরোধ পাঠাননি।",
+  "Abuse reports": "অপব্যবহারের অভিযোগ",
+  "Review unwanted contact and spam reports. Use account management to suspend abusive users.":
+    "অনাকাঙ্ক্ষিত যোগাযোগ ও স্প্যামের অভিযোগ পর্যালোচনা করুন। অপব্যবহারকারীর অ্যাকাউন্ট পরিচালনা থেকে স্থগিত করতে পারবেন।",
+  "Reported by": "অভিযোগকারী",
+  "Reported account": "অভিযুক্ত অ্যাকাউন্ট",
+  "No open abuse reports.": "অমীমাংসিত অভিযোগ নেই।",
+  "People are waiting for your contact approval.":
+    "কিছু ব্যক্তি আপনার যোগাযোগের অনুমোদনের অপেক্ষায় আছেন।",
+  "Review contact requests": "যোগাযোগের অনুরোধ পর্যালোচনা",
+  "View their profile and send a contact request. Their number is shared only after approval.":
+    "প্রোফাইল দেখুন এবং যোগাযোগের অনুরোধ পাঠান। অনুমোদনের পরেই নম্বর দেওয়া হবে।",
+  "JibonDrop connects people with donors who consent to a public listing. Search is free without an account. Contact requests require login and donor approval.":
+    "জীবনড্রপ প্রোফাইল প্রকাশে সম্মত রক্তদাতাদের সঙ্গে যোগাযোগ করিয়ে দেয়। অ্যাকাউন্ট ছাড়াই বিনামূল্যে খুঁজতে পারবেন। যোগাযোগের অনুরোধে লগইন ও রক্তদাতার অনুমোদন প্রয়োজন।",
+  "Your name, blood group, administrative location, optional photo, willingness to donate, recorded donation count and last donation date. Your number is shared only with a signed-in person you approve, for 24 hours. Requests and reveals have account and IP limits.":
+    "আপনার নাম, রক্তের গ্রুপ, প্রশাসনিক এলাকা, ঐচ্ছিক ছবি, রক্তদানের আগ্রহ, নথিভুক্ত রক্তদানের সংখ্যা ও সর্বশেষ তারিখ প্রকাশিত হয়। নম্বর শুধু আপনার অনুমোদিত লগইন করা ব্যক্তিকে ২৪ ঘণ্টার জন্য দেওয়া হয়। অনুরোধ ও নম্বর দেখায় অ্যাকাউন্ট এবং আইপি অনুযায়ী সীমা রয়েছে।",
+  "Hospital names, notes and free-text area fallback remain private. Do not enter patient identity or medical records. Email, account credentials and session records are never public. Contact-request messages are visible only to the sender and donor. Abuse reports are available to administrators.":
+    "হাসপাতালের নাম, নোট ও নিজে লেখা এলাকার বিবরণ ব্যক্তিগত থাকে। রোগীর পরিচয় বা চিকিৎসার তথ্য দেবেন না। ইমেইল, লগইনের তথ্য ও সেশনের তথ্য কখনও প্রকাশিত হয় না। যোগাযোগের অনুরোধ শুধু প্রেরক ও রক্তদাতা দেখতে পান। প্রশাসকেরা অপব্যবহারের অভিযোগ দেখতে পারেন।",
+  PENDING: "অপেক্ষায়",
+  APPROVED: "অনুমোদিত",
+  DECLINED: "প্রত্যাখ্যাত",
+  REVOKED: "অনুমতি প্রত্যাহৃত",
+  EXPIRED: "মেয়াদ শেষ",
+  UNWANTED_CONTACT: "অনাকাঙ্ক্ষিত যোগাযোগ",
+  SPAM: "স্প্যাম",
+  INAPPROPRIATE_BEHAVIOR: "অসঙ্গত আচরণ",
+  "resolve-report": "অভিযোগ পর্যালোচনা",
   "Remove area filter": "এলাকার শর্ত সরান",
   "Remove upazila / thana filter": "উপজেলা / থানার শর্ত সরান",
   "Remove district filter": "জেলার শর্ত সরান",

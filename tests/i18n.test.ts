@@ -1,10 +1,11 @@
 import { expect, it } from "vitest";
 import { normalizeLocale, translator } from "../lib/i18n";
 import { dateLabel } from "../lib/format";
-it("defaults to Bangla and accepts only the two supported languages", () => {
-  expect(normalizeLocale()).toBe("bn");
-  expect(normalizeLocale("fr")).toBe("bn");
+it("defaults to English and accepts only the two supported languages", () => {
+  expect(normalizeLocale()).toBe("en");
+  expect(normalizeLocale("fr")).toBe("en");
   expect(normalizeLocale("en")).toBe("en");
+  expect(normalizeLocale("bn")).toBe("bn");
 });
 it("translates interface text while preserving user content and blood groups", () => {
   expect(translator("bn")("Save profile")).toBe("প্রোফাইল সংরক্ষণ করুন");
