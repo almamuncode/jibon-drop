@@ -1,15 +1,9 @@
-# Implementation verification
+# Current authentication verification
 
-Executed locally on 2 October 2026:
+Authentication now uses Better Auth with Google or email/username and password. The earlier OTP test report is superseded.
 
-- ESLint: passed, no warnings.
-- TypeScript: passed.
-- Vitest: 13 tests passed, including canonical Bangladesh numbers/Bangla digits, calendar validation/Dhaka boundary, production mock safeguards, public projection privacy, consent, all imported location parents and real image decoding/size.
-- Production build: passed using Next.js webpack. The default Turbopack worker was blocked from binding its sandbox evaluation port; webpack completed successfully.
-- Isolated PostgreSQL-compatible integration suite: passed. Applied migration SQL and imported all location records into an ephemeral PGlite instance exposed via the PostgreSQL wire protocol. Used Prisma's pg adapter and actual HTTP route handlers, not mocked repositories. Tested anonymous search and phone-free HTML, OTP one-time use/expiry/cooldown/maximum attempts, authenticated mutations, hierarchy rejection, donation ownership, retry idempotency and aggregate add/edit/delete, consent withdrawal, hidden URL 404, replacement-phone verification/revocation, canonical account uniqueness, account deletion, and persistent anonymous contact throttling.
-- Playwright Chromium: passed mobile overflow check at 390px, cascading location resets, accessible labels and keyboard skip link. Desktop (1440px) and full-page mobile screenshots were visually inspected.
-- Dependency audit: no known vulnerabilities after development transitive dependency patches.
+Verified against an isolated PostgreSQL-compatible PGlite database and actual HTTP handlers: registration, duplicate email/username rejection, non-plaintext password storage, email login, case-insensitive username login, wrong password rejection, account/IP persistent throttling, authenticated donor profile editing, invalid location hierarchy rejection, contact phone normalization without claiming verification, private identity projection, donation ownership/idempotency and aggregate add/edit/delete, hidden profile 404, contact consent withdrawal, logout and account deletion revoking all sessions and credentials.
 
-No production services were contacted in end-to-end tests. Twilio SMS acceptance, actual handset delivery, Neon networking and Vercel Blob write/delete still need deployment credentials and real service smoke checks. Image decode/size validation was tested locally; live Blob replacement, deletion retry and CDN expiration were not exercised. PGlite verifies PostgreSQL semantics locally but does not replace a final Neon test. The source location snapshot is dated 17 March 2023, with 8 divisions, 64 districts, 494 upazilas and 4,540 unions. Urban thana/ward completeness and current administrative coverage remain explicitly unverified.
+Playwright mobile browser verification covered manual registration, donor profile completion, username login and horizontal layout bounds at 390px. Unit tests cover registration schema normalization/password limits, phone normalization, location imports, donation calendar dates and image decoding. No fake donor was seeded into the configured database.
 
-The test suite cleans all donor fixtures from its isolated database. No fake donor is included in the production seed. No public deployment was performed.
+Real Google OAuth callback and live Vercel Blob delivery/cleanup still need credentials and an external service smoke test. Google sign-in is visibly disabled until configured. Password recovery email delivery is not configured or advertised. Manual email ownership is not verified; Google/password auto-linking and email changes are disabled. Contact numbers are self-reported. Legacy donor data is preserved by the migration and cannot be claimed just by typing its number.

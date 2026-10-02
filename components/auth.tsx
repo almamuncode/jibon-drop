@@ -1,124 +1,178 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-export function AuthForm({ change = false }: { change?: boolean }) {
+import { authClient } from "@/lib/auth-client";
+export function AuthForm({
+  register = false,
+  googleEnabled = false,
+}: {
+  register?: boolean;
+  googleEnabled?: boolean;
+}) {
   const router = useRouter();
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [sent, setSent] = useState(false);
-  const [dev, setDev] = useState("");
-  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  async function submit(verify: boolean) {
+  const [error, setError] = useState("");
+  async function google() {
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/otp/" + (verify ? "verify" : "send"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone,
-          code,
-          purpose: change ? "change" : "login",
-        }),
+      const result = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard/profile",
+        errorCallbackURL: "/login?error=google",
       });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error);
-      if (verify) {
-        router.push(data.redirect);
-        router.refresh();
-      } else {
-        setSent(true);
-        setDev(data.devCode || "");
-        setCooldown(Date.now() + 60000);
-      }
+      if (result.error)
+        throw new Error(result.error.message || "Google sign-in failed.");
     } catch (e) {
       setError((e as Error).message);
-    } finally {
       setBusy(false);
     }
   }
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit(sent);
-      }}
-    >
-      <label htmlFor={change ? "new-phone" : "phone"}>
-        {change ? "New mobile number" : "Bangladesh mobile number"}
-      </label>
-      <input
-        id={change ? "new-phone" : "phone"}
-        type="tel"
-        autoComplete="tel"
-        placeholder="01XXXXXXXXX"
-        required
-        value={phone}
-        readOnly={sent}
-        onChange={(e) => setPhone(e.target.value)}
-      />
-      {sent && (
-        <>
-          <label htmlFor="code">6-digit verification code</label>
-          <input
-            id="code"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            pattern="[0-9]{6}"
-            maxLength={6}
-            required
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-          <p className="muted">
-            Code expires in 5 minutes. You have up to 5 attempts.
-          </p>
-        </>
-      )}
-      {dev && (
-        <div className="notice">
-          Development mock SMS — code: <strong>{dev}</strong>. No SMS was sent.
-        </div>
-      )}
-      <button className="button full" disabled={busy}>
-        {busy
-          ? "Please wait…"
-          : sent
-            ? "Verify & continue"
-            : "Send verification code"}
+    <>
+      <button
+        type="button"
+        className="button secondary full"
+        disabled={busy || !googleEnabled}
+        onClick={google}
+      >
+        Continue with Google
       </button>
-      {sent && (
-        <div className="actions">
-          <button
-            type="button"
-            className="text-button"
-            onClick={() => {
-              setSent(false);
-              setDev("");
-              setCode("");
-            }}
-          >
-            Change number
-          </button>
-          <button
-            type="button"
-            className="text-button"
-            disabled={busy}
-            onClick={() => {
-              if (Date.now() < cooldown)
-                setError("Please wait 60 seconds before resending.");
-              else submit(false);
-            }}
-          >
-            Resend code
-          </button>
-        </div>
+      {!googleEnabled && (
+        <p className="muted">
+          Google sign-in will be available once it is configured. You can use
+          email and password below.
+        </p>
       )}
-      <p role="alert" className="error">
-        {error}
+      <p className="auth-divider">
+        or {register ? "create an account" : "sign in with your password"}
       </p>
-    </form>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          setError("");
+          const f = new FormData(e.currentTarget);
+          try {
+            let result;
+            if (register) {
+              if (f.get("password") !== f.get("confirmPassword"))
+                throw new Error("Passwords do not match.");
+              result = await authClient.signUp.email({
+                name: String(f.get("name")).trim(),
+                email: String(f.get("email")).trim().toLowerCase(),
+                username: String(f.get("username")).trim().toLowerCase(),
+                password: String(f.get("password")),
+              });
+            } else {
+              const identifier = String(f.get("identifier"))
+                .trim()
+                .toLowerCase();
+              result = identifier.includes("@")
+                ? await authClient.signIn.email({
+                    email: identifier,
+                    password: String(f.get("password")),
+                  })
+                : await authClient.signIn.username({
+                    username: identifier,
+                    password: String(f.get("password")),
+                  });
+            }
+            if (result.error)
+              throw new Error(
+                register
+                  ? result.error.message || "Unable to create account."
+                  : "Invalid email, username or password.",
+              );
+            router.push(register ? "/dashboard/profile" : "/dashboard");
+            router.refresh();
+          } catch (e) {
+            setError((e as Error).message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {register ? (
+          <>
+            <label htmlFor="auth-name">Full name</label>
+            <input
+              id="auth-name"
+              name="name"
+              required
+              minLength={2}
+              maxLength={80}
+              autoComplete="name"
+            />
+            <label htmlFor="auth-email">Email</label>
+            <input
+              id="auth-email"
+              name="email"
+              type="email"
+              required
+              maxLength={254}
+              autoComplete="email"
+            />
+            <label htmlFor="auth-username">Username</label>
+            <input
+              id="auth-username"
+              name="username"
+              required
+              minLength={3}
+              maxLength={30}
+              pattern="[A-Za-z0-9_]+"
+              autoComplete="username"
+              aria-describedby="username-help"
+            />
+            <p id="username-help" className="muted">
+              3–30 letters, numbers or underscores. Usernames are
+              case-insensitive.
+            </p>
+          </>
+        ) : (
+          <>
+            <label htmlFor="identifier">Email or username</label>
+            <input
+              id="identifier"
+              name="identifier"
+              required
+              autoComplete="username"
+            />
+          </>
+        )}
+        <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          minLength={register ? 10 : undefined}
+          maxLength={128}
+          autoComplete={register ? "new-password" : "current-password"}
+        />
+        {register && (
+          <>
+            <p className="muted">
+              Use at least 10 characters. Your password is stored as a secure
+              hash.
+            </p>
+            <label htmlFor="confirmPassword">Confirm password</label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              autoComplete="new-password"
+            />
+          </>
+        )}
+        <button className="button full" disabled={busy}>
+          {busy ? "Please wait…" : register ? "Create account" : "Log in"}
+        </button>
+        <p role="alert" className="error">
+          {error}
+        </p>
+      </form>
+    </>
   );
 }

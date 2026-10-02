@@ -22,8 +22,10 @@ model Location {
 model Donor {
  id String @id @default(cuid())
  publicId String @unique @default(uuid())
- phone String @unique
- phoneVerifiedAt DateTime
+ userId String? @unique
+ user User? @relation(fields:[userId], references:[id], onDelete:Cascade)
+ phone String? @unique
+ phoneVerifiedAt DateTime?
  name String @default("")
  bloodGroup String @default("")
  divisionId String?
@@ -41,27 +43,64 @@ model Donor {
  consentAt DateTime?
  createdAt DateTime @default(now())
  updatedAt DateTime @updatedAt
- sessions Session[]
+
  donations Donation[]
  donationCount Int @default(0)
  lastDonation DateTime? @db.Date
  @@index([bloodGroup, visible, divisionId, districtId, localityId, areaId])
 }
-model Session {
- tokenHash String @id
- donorId String
- donor Donor @relation(fields: [donorId], references: [id], onDelete: Cascade)
- expiresAt DateTime
- @@index([donorId])
+model User {
+ id String @id
+ name String
+ email String @unique
+ emailVerified Boolean @default(false)
+ image String?
+ username String? @unique
+ displayUsername String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ sessions Session[]
+ accounts Account[]
+ donor Donor?
 }
-model Otp {
- phone String @id
- codeHash String
+model Session {
+ id String @id
+ token String @unique
+ userId String
+ user User @relation(fields:[userId], references:[id], onDelete:Cascade)
  expiresAt DateTime
- sentAt DateTime
- attempts Int @default(0)
- purpose String
- donorId String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ ipAddress String?
+ userAgent String?
+ @@index([userId])
+}
+model Account {
+ id String @id
+ accountId String
+ providerId String
+ userId String
+ user User @relation(fields:[userId], references:[id], onDelete:Cascade)
+ accessToken String?
+ refreshToken String?
+ idToken String?
+ accessTokenExpiresAt DateTime?
+ refreshTokenExpiresAt DateTime?
+ scope String?
+ password String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ @@index([userId])
+ @@unique([providerId,accountId])
+}
+model Verification {
+ id String @id
+ identifier String
+ value String
+ expiresAt DateTime
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ @@index([identifier])
 }
 model Donation {
  id String @id @default(uuid())

@@ -23,8 +23,8 @@ export default function Privacy() {
       <h2>Private information</h2>
       <p>
         Hospital names, notes and free-text area fallback remain private. Do not
-        enter patient identity or medical records. Phone verification and
-        session records are never public.
+        enter patient identity or medical records. Email, account credentials
+        and session records are never public.
       </p>
       <h2>Contact with care</h2>
       <p>
@@ -34,10 +34,12 @@ export default function Privacy() {
       </p>
       <h2>Service data</h2>
       <p>
-        Phone verification uses an SMS provider. Photos use Vercel Blob storage.
-        Short-lived hashed rate-limit records protect contact and login actions.
-        Sessions expire after 30 days. Account deletion removes profile and
-        donation data; failed photo removal is queued for retry.
+        Sign-in uses Google or email/username and a securely hashed password.
+        Contact numbers are self-reported and are not verified. Photos use
+        Vercel Blob storage. Short-lived hashed rate-limit records protect
+        contact and login actions. Sessions expire after 30 days. Account
+        deletion removes profile and donation data; failed photo removal is
+        queued for retry.
       </p>
     </article>
   );

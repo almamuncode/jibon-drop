@@ -786,3 +786,10 @@ textarea {
     font-size: 10px;
   }
 }
+
+.auth-divider {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin: 22px 0 5px;
+}

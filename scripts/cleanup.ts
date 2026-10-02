@@ -11,8 +11,8 @@ async function main() {
     }
   }
   await db().session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
-  await db().otp.deleteMany({
-    where: { expiresAt: { lt: new Date(Date.now() - 86400000) } },
+  await db().verification.deleteMany({
+    where: { expiresAt: { lt: new Date() } },
   });
   await db().rateLimit.deleteMany({ where: { resetAt: { lt: new Date() } } });
   await db().$disconnect();

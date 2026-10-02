@@ -4,9 +4,9 @@ import {
   normalizePhone,
   donationSchema,
   dhakaToday,
-  mockEnabled,
   profileSchema,
   bloodGroups,
+  registrationSchema,
 } from "../lib/validation";
 import { validateImage } from "../lib/image";
 import { publicSelect } from "../lib/public";
@@ -55,30 +55,11 @@ describe("public privacy and production safeguards", () => {
     ])
       expect(publicSelect).not.toHaveProperty(key);
   });
-  it("forbids production mock even when enabled", () =>
-    expect(() =>
-      mockEnabled({
-        NODE_ENV: "production",
-        SMS_PROVIDER: "mock",
-        ENABLE_DEV_OTP: "true",
-      }),
-    ).toThrow());
-  it("requires explicitly enabled development mock", () => {
-    expect(mockEnabled({ NODE_ENV: "development", SMS_PROVIDER: "mock" })).toBe(
-      false,
-    );
-    expect(
-      mockEnabled({
-        NODE_ENV: "development",
-        SMS_PROVIDER: "mock",
-        ENABLE_DEV_OTP: "true",
-      }),
-    ).toBe(true);
-  });
   it("requires consent for publication", () =>
     expect(
       profileSchema.safeParse({
         name: "Donor",
+        phone: "01712345678",
         bloodGroup: "A+",
         divisionId: "x",
         districtId: "y",
@@ -115,5 +96,36 @@ describe("server image decoding", () => {
     const clean = await validateImage(image);
     expect(clean.length).toBeLessThanOrEqual(100000);
     expect((await sharp(clean).metadata()).format).toBe("webp");
+  });
+});
+
+describe("account validation", () => {
+  it("normalizes account identities without altering passwords", () => {
+    const value = registrationSchema.parse({
+      name: " Donor Name ",
+      email: "User@Example.com",
+      username: "Donor_USER",
+      password: "Password with Spaces",
+    });
+    expect(value.email).toBe("user@example.com");
+    expect(value.username).toBe("donor_user");
+    expect(value.name).toBe("Donor Name");
+    expect(value.password).toBe("Password with Spaces");
+  });
+  it("rejects short passwords and invalid usernames", () => {
+    for (const override of [
+      { password: "short" },
+      { username: "bad name" },
+      { name: "" },
+    ])
+      expect(
+        registrationSchema.safeParse({
+          name: "Donor",
+          email: "donor@example.com",
+          username: "donor_user",
+          password: "a-safe-password",
+          ...override,
+        }).success,
+      ).toBe(false);
   });
 });

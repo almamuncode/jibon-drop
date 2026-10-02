@@ -47,8 +47,8 @@ export function Contact({ publicId }: { publicId: string }) {
             Copy
           </button>
           <p className="muted">
-            Contact respectfully. Explain your need and respect the donor’s
-            decision.
+            This number is self-reported and unverified. Contact respectfully.
+            Explain your need and respect the donor’s decision.
           </p>
         </>
       ) : (

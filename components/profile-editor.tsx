@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Locations, LocationValue } from "./locations";
 import { PhotoEditor } from "./photo";
-import { AuthForm } from "./auth";
 import { api } from "./dashboard";
 import { bloodGroups } from "@/lib/validation";
 type Profile = {
@@ -41,6 +40,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           try {
             await api("profile", {
               name: f.get("name"),
+              phone: f.get("phone"),
               bloodGroup: f.get("bloodGroup"),
               ...loc,
               localityId: loc.localityId || null,
@@ -69,6 +69,20 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           defaultValue={p.name}
           autoComplete="name"
         />
+        <label htmlFor="contact-phone">Contact mobile number</label>
+        <input
+          id="contact-phone"
+          name="phone"
+          type="tel"
+          required
+          autoComplete="tel"
+          defaultValue={p.phone}
+          placeholder="01XXXXXXXXX"
+        />
+        <p className="muted">
+          Used for donor contact, never for login. Numbers are self-reported and
+          not verified by JibonDrop.
+        </p>
         <label htmlFor="profile-blood">Blood group</label>
         <select
           id="profile-blood"
@@ -125,15 +139,6 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
       </form>
       <div className="dashboard-panel">
         <PhotoEditor hasPhoto={p.hasPhoto} />
-      </div>
-      <div className="dashboard-panel">
-        <h2>Verified mobile number</h2>
-        <p>{p.phone}</p>
-        <details>
-          <summary>Change mobile number</summary>
-          <p>Verify the replacement number. Other sessions will be revoked.</p>
-          <AuthForm change />
-        </details>
       </div>
     </>
   );

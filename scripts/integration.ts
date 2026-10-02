@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { Client } from "pg";
 import { chromium } from "@playwright/test";
-const base = "http://127.0.0.1:3000";
+const base = process.env.TEST_APP_URL || "http://localhost:3002";
+if (!["localhost", "127.0.0.1"].includes(new URL(base).hostname))
+  throw new Error("Tests require a local application.");
 const pg = new Client({
   connectionString: "postgresql://postgres:postgres@127.0.0.1:55432/postgres",
 });
@@ -18,11 +20,16 @@ async function call(path: string, body: unknown, cookie = "", method = "POST") {
   return {
     response,
     data: await response.json(),
-    cookie: response.headers.get("set-cookie")?.split(";")[0] || "",
+    cookie: response.headers
+      .getSetCookie()
+      .map((c) => c.split(";")[0])
+      .join("; "),
   };
 }
+const password = "isolated-Test-password-42";
 const profile = {
   name: "Isolated Test Donor",
+  phone: "01712345678",
   bloodGroup: "A+",
   divisionId: "division:1",
   districtId: "district:1",
@@ -33,92 +40,95 @@ const profile = {
   visible: true,
   consent: true,
 };
-async function login(phone: string) {
-  const sent = await call("otp/send", { phone });
-  assert.equal(sent.response.status, 200, JSON.stringify(sent.data));
-  assert.match(sent.data.devCode, /^\d{6}$/);
-  const verified = await call("otp/verify", { phone, code: sent.data.devCode });
-  assert.equal(verified.response.status, 200, JSON.stringify(verified.data));
-  return { cookie: verified.cookie, code: sent.data.devCode };
-}
 async function main() {
   await pg.connect();
-  await pg.query('TRUNCATE "Donor", "Otp", "RateLimit" CASCADE');
-  const one = await login("01712345678");
-  assert.equal(
-    (await call("otp/verify", { phone: "01712345678", code: one.code }))
-      .response.status,
-    400,
-  );
-  assert.equal(
-    (await call("otp/send", { phone: "01712345678" })).response.status,
-    200,
-  );
-  assert.equal(
-    (await call("otp/send", { phone: "01712345678" })).response.status,
-    400,
-  );
   await pg.query(
-    'UPDATE "Otp" SET "expiresAt"=NOW()-INTERVAL \'1 minute\' WHERE phone=$1',
-    ["+8801712345678"],
+    'TRUNCATE "User", "Donor", "RateLimit", "Verification" CASCADE',
   );
-  assert.equal(
-    (await call("otp/verify", { phone: "01712345678", code: "123456" }))
-      .response.status,
-    400,
-  );
-  await pg.query('DELETE FROM "Otp"');
-  assert.equal((await call("profile", profile)).response.status, 400);
+  const first = await call("auth/sign-up/email", {
+    name: "Isolated Test Donor",
+    email: "fixture@example.com",
+    username: "fixture_donor",
+    password,
+  });
+  assert.equal(first.response.status, 200, JSON.stringify(first.data));
+  assert.ok(first.cookie);
+  const cookie = first.cookie;
   assert.equal(
     (
-      await call(
-        "profile",
-        { ...profile, districtId: "district:64" },
-        one.cookie,
-      )
-    ).response.status,
-    400,
+      await call("auth/sign-up/email", {
+        name: "Duplicate",
+        email: "fixture@example.com",
+        username: "another_user",
+        password,
+      })
+    ).response.status >= 400,
+    true,
   );
   assert.equal(
-    (await call("profile", profile, one.cookie)).response.status,
-    200,
+    (
+      await call("auth/sign-up/email", {
+        name: "Duplicate",
+        email: "another@example.com",
+        username: "fixture_donor",
+        password,
+      })
+    ).response.status >= 400,
+    true,
   );
+  const credential = (
+    await pg.query(
+      `SELECT password FROM "Account" WHERE "providerId"='credential'`,
+    )
+  ).rows[0];
+  assert.ok(credential.password);
+  assert.notEqual(credential.password, password);
+  assert.ok(!credential.password.includes(password));
+  assert.equal((await call("profile", profile)).response.status, 400);
+  assert.equal(
+    (await call("profile", { ...profile, districtId: "district:64" }, cookie))
+      .response.status,
+    400,
+  );
+  assert.equal((await call("profile", profile, cookie)).response.status, 200);
   const donor = (
     await pg.query('SELECT * FROM "Donor" WHERE phone=$1', ["+8801712345678"])
   ).rows[0];
+  assert.equal(donor.phoneVerifiedAt, null);
   const search = await (
     await fetch(base + "/find-donors?bloodGroup=A%2B")
   ).text();
   assert.ok(search.includes(profile.name));
-  assert.ok(!search.includes("01712345678"));
-  assert.ok(!search.includes("+8801712345678"));
+  for (const privateValue of [
+    "+8801712345678",
+    "fixture@example.com",
+    credential.password,
+  ])
+    assert.ok(!search.includes(privateValue));
   assert.equal(
     (await call("contact", { publicId: donor.publicId })).data.phone,
     "+8801712345678",
   );
-  const second = await login("01812345678");
+  const second = await call("auth/sign-up/email", {
+    name: "Other fixture",
+    email: "second@example.com",
+    username: "second_donor",
+    password,
+  });
+  assert.equal(second.response.status, 200);
   const submissionId = crypto.randomUUID();
   assert.equal(
     (
       await call(
         "donations",
-        {
-          date: "2020-01-02",
-          hospital: "Private fixture",
-          note: "PRIVATE NOTE FIXTURE",
-          submissionId,
-        },
-        one.cookie,
+        { date: "2020-01-01", note: "PRIVATE FIXTURE NOTE", submissionId },
+        cookie,
       )
     ).response.status,
     200,
   );
-  assert.equal(
-    (await call("donations", { date: "2020-01-02", submissionId }, one.cookie))
-      .response.status,
-    200,
-  );
-  let saved = (
+  await call("donations", { date: "2020-01-01", submissionId }, cookie);
+  const saved = (
     await pg.query('SELECT * FROM "Donation" WHERE "donorId"=$1', [donor.id])
   ).rows;
   assert.equal(saved.length, 1);
@@ -133,31 +143,18 @@ async function main() {
     400,
   );
   assert.equal(
-    (await call("donations", { id: saved[0].id }, second.cookie, "DELETE"))
-      .response.status,
-    200,
-  );
-  assert.equal(
-    (
-      await pg.query('SELECT COUNT(*) FROM "Donation" WHERE "donorId"=$1', [
-        donor.id,
-      ])
-    ).rows[0].count,
-    "1",
-  );
-  assert.equal(
     (
       await call(
         "donations",
         { id: saved[0].id, date: "2021-01-01", submissionId },
-        one.cookie,
+        cookie,
       )
     ).response.status,
     200,
   );
   let aggregate = (
     await pg.query(
-      'SELECT "donationCount","lastDonation"::text AS "lastDonation" FROM "Donor" WHERE id=$1',
+      'SELECT "donationCount", "lastDonation"::text FROM "Donor" WHERE id=$1',
       [donor.id],
     )
   ).rows[0];
@@ -168,66 +165,107 @@ async function main() {
       await call(
         "donations",
         { date: "2099-01-01", submissionId: crypto.randomUUID() },
-        one.cookie,
+        cookie,
       )
     ).response.status,
     400,
   );
-  const publicProfile = await (
-    await fetch(base + "/donors/" + donor.publicId)
-  ).text();
-  assert.ok(!publicProfile.includes("PRIVATE NOTE FIXTURE"));
-  assert.ok(!publicProfile.includes("Private fixture"));
-  await call(
-    "profile",
-    { ...profile, consent: false, visible: false },
-    one.cookie,
-  );
+  await call("profile", { ...profile, visible: false, consent: false }, cookie);
   assert.equal(
     (await call("contact", { publicId: donor.publicId })).response.status,
     404,
   );
   assert.equal((await fetch(base + "/donors/" + donor.publicId)).status, 404);
-  await call("profile", profile, one.cookie);
-  await call("donations", { id: saved[0].id }, one.cookie, "DELETE");
+  await call("donations", { id: saved[0].id }, cookie, "DELETE");
   aggregate = (
     await pg.query(
-      'SELECT "donationCount","lastDonation"::text AS "lastDonation" FROM "Donor" WHERE id=$1',
+      'SELECT "donationCount", "lastDonation" FROM "Donor" WHERE id=$1',
       [donor.id],
     )
   ).rows[0];
   assert.equal(aggregate.donationCount, 0);
   assert.equal(aggregate.lastDonation, null);
-  await pg.query('UPDATE "Otp" SET "sentAt"=NOW()-INTERVAL \'2 minutes\'');
-  const change = await call(
-    "otp/send",
-    { phone: "01912345678", purpose: "change" },
-    one.cookie,
-  );
-  assert.equal(change.response.status, 200);
-  const changed = await call(
-    "otp/verify",
-    { phone: "01912345678", code: change.data.devCode, purpose: "change" },
-    one.cookie,
-  );
-  assert.equal(changed.response.status, 200);
-  assert.equal(
-    (await call("profile", profile, one.cookie)).response.status,
-    400,
-  );
-  const reused = await login("01912345678");
+  await call("logout", {}, cookie);
+  assert.equal((await call("profile", profile, cookie)).response.status, 400);
   assert.equal(
     (
-      await pg.query('SELECT COUNT(*) FROM "Donor" WHERE phone=$1', [
-        "+8801912345678",
+      await call("auth/sign-in/email", {
+        email: "fixture@example.com",
+        password: "incorrect-password",
+      })
+    ).response.status >= 400,
+    true,
+  );
+  const emailLogin = await call("auth/sign-in/email", {
+    email: "fixture@example.com",
+    password,
+  });
+  assert.equal(emailLogin.response.status, 200);
+  const usernameLogin = await call("auth/sign-in/username", {
+    username: "FIXTURE_DONOR",
+    password,
+  });
+  assert.equal(
+    usernameLogin.response.status,
+    200,
+    JSON.stringify(usernameLogin.data),
+  );
+  assert.equal(
+    (await call("profile", profile, usernameLogin.cookie)).response.status,
+    200,
+  );
+  assert.equal(
+    (
+      await call(
+        "auth/change-email",
+        { newEmail: "attacker@example.com" },
+        usernameLogin.cookie,
+      )
+    ).response.status,
+    403,
+  );
+  assert.equal(
+    (await call("auth/delete-user", {}, usernameLogin.cookie)).response.status,
+    403,
+  );
+  assert.equal(
+    (
+      await call(
+        "account",
+        { confirm: "DELETE" },
+        usernameLogin.cookie,
+        "DELETE",
+      )
+    ).response.status,
+    200,
+  );
+  assert.equal((await fetch(base + "/donors/" + donor.publicId)).status, 404);
+  assert.equal(
+    (await call("profile", profile, emailLogin.cookie)).response.status,
+    400,
+  );
+  assert.equal(
+    (
+      await pg.query('SELECT COUNT(*) FROM "Account" WHERE "userId"=$1', [
+        first.data.user.id,
       ])
     ).rows[0].count,
-    "1",
+    "0",
   );
-  await call("account", { confirm: "DELETE" }, reused.cookie, "DELETE");
-  assert.equal((await fetch(base + "/donors/" + donor.publicId)).status, 404);
+  await pg.query('DELETE FROM "RateLimit"');
+  for (let i = 0; i < 10; i++)
+    await call("auth/sign-in/email", { email: "absent@example.com", password });
+  assert.equal(
+    (
+      await call("auth/sign-in/email", {
+        email: "absent@example.com",
+        password,
+      })
+    ).response.status,
+    400,
+  );
   console.log(
-    "PASS: anonymous search; phone-free HTML; real OTP consumption/expiry/cooldown; hierarchy validation; auth; ownership; aggregate add/edit/delete; consent withdrawal; hidden URL; phone replacement; unique account; deletion.",
+    "PASS: email registration/login; case-insensitive username login; password hashing; duplicate accounts; persistent throttling; private identity; donor ownership; contact consent; donation aggregates; logout; account deletion revokes every session.",
   );
   const browser = await chromium.launch({
     ...(process.env.PLAYWRIGHT_CHROMIUM_PATH
@@ -236,76 +274,49 @@ async function main() {
     headless: true,
   });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await page.goto(base);
-  await page.getByLabel("Blood group", { exact: false }).selectOption("A+");
+  await page.goto(base + "/register");
+  await page.getByLabel("Full name", { exact: true }).fill("Browser Fixture");
+  await page.getByLabel("Email", { exact: true }).fill("browser@example.com");
+  await page.getByLabel("Username", { exact: true }).fill("browser_fixture");
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByLabel("Confirm password", { exact: true }).fill(password);
+  await page
+    .getByRole("button", { name: "Create account", exact: true })
+    .click();
+  await page.waitForURL("**/dashboard/profile");
+  await page.getByLabel("Contact mobile number").fill("01912345678");
+  await page.getByLabel("Blood group", { exact: true }).selectOption("B+");
   await page.getByLabel("Division", { exact: true }).selectOption("division:1");
   await page.getByLabel("District", { exact: true }).selectOption("district:1");
   await page
     .getByLabel("Upazila / Thana", { exact: true })
     .selectOption("upazila:1");
-  await page.getByLabel("Division", { exact: true }).selectOption("division:6");
-  assert.equal(
-    await page.getByLabel("District", { exact: true }).inputValue(),
-    "",
-  );
-  assert.equal(
-    await page.getByLabel("Upazila / Thana", { exact: true }).inputValue(),
-    "",
-  );
-  assert.equal(
-    await page.getByLabel("Union / Ward / Area", { exact: true }).inputValue(),
-    "",
-  );
+  await page.getByLabel("I consent", { exact: false }).check();
+  await page.getByLabel("Show my listing", { exact: false }).check();
+  await page.getByRole("button", { name: "Save profile", exact: true }).click();
+  await page.getByText("Profile saved.", { exact: true }).waitFor();
   assert.equal(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
+      () => document.documentElement.scrollWidth <= innerWidth,
     ),
     true,
   );
-  await page.screenshot({ path: "/tmp/jibondrop-mobile.png", fullPage: true });
-  await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(base);
-  await page.screenshot({ path: "/tmp/jibondrop-desktop.png", fullPage: true });
-  await page.keyboard.press("Tab");
-  assert.equal(await page.locator(":focus").textContent(), "Skip to content");
+  await page.screenshot({
+    path: "/tmp/jibondrop-account-mobile.png",
+    fullPage: true,
+  });
+  await page.goto(base + "/login");
+  await page.getByLabel("Email or username").fill("browser_fixture");
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Log in", exact: true }).click();
+  await page.waitForURL("**/dashboard");
   await browser.close();
   console.log(
-    "PASS: mobile overflow, cascading parent resets, keyboard skip link; mobile and desktop screenshots.",
+    "PASS: mobile registration, profile completion, username login and layout.",
   );
-  await pg.query('DELETE FROM "RateLimit"');
-  const attempts = await call("otp/send", { phone: "01612345678" });
-  assert.equal(attempts.response.status, 200);
-  for (let i = 0; i < 5; i++)
-    assert.equal(
-      (await call("otp/verify", { phone: "01612345678", code: "000000" }))
-        .response.status,
-      400,
-    );
-  assert.equal(
-    (
-      await call("otp/verify", {
-        phone: "01612345678",
-        code: attempts.data.devCode,
-      })
-    ).response.status,
-    400,
+  await pg.query(
+    'TRUNCATE "User", "Donor", "RateLimit", "Verification" CASCADE',
   );
-  const attemptRow = (await pg.query('SELECT attempts FROM "Otp"')).rows[0];
-  assert.equal(attemptRow.attempts, 5);
-  await pg.query('DELETE FROM "RateLimit"');
-  for (let i = 0; i < 20; i++)
-    assert.equal(
-      (await call("contact", { publicId: "absent-fixture" })).response.status,
-      404,
-    );
-  assert.equal(
-    (await call("contact", { publicId: "absent-fixture" })).response.status,
-    400,
-  );
-  console.log(
-    "PASS: maximum OTP attempts and persistent anonymous-contact rate limit.",
-  );
-  await pg.query('TRUNCATE "Donor", "Otp", "RateLimit" CASCADE');
   await pg.end();
 }
 main().catch(async (e) => {

@@ -1,3 +1,5 @@
+import { googleConfigured } from "@/lib/auth";
+import Link from "next/link";
 import { AuthForm } from "@/components/auth";
 export default function Register() {
   return (
@@ -9,12 +11,13 @@ export default function Register() {
           <br />A lot of hope.
         </h1>
         <p>
-          First, verify your mobile number. Then add your name, blood group and
-          location. A photo is optional.
+          Create an account or continue with Google. Then add your contact
+          number, blood group and location. No SMS is required.
         </p>
-        <AuthForm />
+        <AuthForm register googleEnabled={googleConfigured()} />
         <p className="muted">
-          You choose whether your profile is listed and your number is shared.
+          Already registered? <Link href="/login">Log in</Link>. You choose
+          whether your profile is listed and your number is shared.
         </p>
       </div>
     </div>

@@ -1,25 +1,19 @@
 import { NextResponse } from "next/server";
-import { randomInt } from "node:crypto";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
+import { getAuth } from "@/lib/auth";
 import { put, del } from "@vercel/blob";
 import { db } from "@/lib/db";
 import {
   checkOrigin,
-  createSession,
-  hash,
-  sessionToken,
   rateLimit,
   requestIp,
   requireDonor,
-  secretHash,
 } from "@/lib/security";
 import {
   donationSchema,
   normalizePhone,
   profileSchema,
-  mockEnabled,
 } from "@/lib/validation";
-import { sendOtp } from "@/lib/sms";
 import { published, validateHierarchy } from "@/lib/public";
 import { validateImage } from "@/lib/image";
 export const dynamic = "force-dynamic";
@@ -55,8 +49,6 @@ async function handle(
     }
     checkOrigin(req);
     const methods: Record<string, string[]> = {
-      "otp/send": ["POST"],
-      "otp/verify": ["POST"],
       contact: ["POST"],
       logout: ["POST"],
       profile: ["POST"],
@@ -70,101 +62,6 @@ async function handle(
         { error: "Method not allowed" },
         { status: 405 },
       );
-    mockEnabled();
-    if (action === "otp/send") {
-      const body = await req.json();
-      const phone = normalizePhone(String(body.phone));
-      const purpose = body.purpose === "change" ? "change" : "login";
-      const donor = purpose === "change" ? await requireDonor() : null;
-      await rateLimit("otp-ip:" + requestIp(req), 10, 3600);
-      await rateLimit("otp-phone:" + phone, 5, 3600);
-      const code = String(randomInt(100000, 1000000));
-      const claimed = await db().$transaction(async (tx) => {
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${phone}))`;
-        const old = await tx.otp.findUnique({ where: { phone } });
-        if (old && Date.now() - old.sentAt.getTime() < 60000)
-          throw new Error("Wait 60 seconds before requesting another code.");
-        return tx.otp.upsert({
-          where: { phone },
-          create: {
-            phone,
-            codeHash: secretHash(phone + code),
-            sentAt: new Date(),
-            expiresAt: new Date(Date.now() + 300000),
-            purpose,
-            donorId: donor?.id,
-          },
-          update: {
-            codeHash: secretHash(phone + code),
-            sentAt: new Date(),
-            expiresAt: new Date(Date.now() + 300000),
-            attempts: 0,
-            purpose,
-            donorId: donor?.id || null,
-          },
-        });
-      });
-      try {
-        return NextResponse.json(await sendOtp(phone, code));
-      } catch (e) {
-        await db().otp.deleteMany({
-          where: { phone, codeHash: claimed.codeHash },
-        });
-        throw e;
-      }
-    }
-    if (action === "otp/verify") {
-      const body = await req.json();
-      const phone = normalizePhone(String(body.phone));
-      await rateLimit("verify:" + requestIp(req), 30, 3600);
-      const changeDonor =
-        body.purpose === "change" ? await requireDonor() : null;
-      const result = await db().$transaction(async (tx) => {
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${phone}))`;
-        const otp = await tx.otp.findUnique({ where: { phone } });
-        if (
-          !otp ||
-          otp.expiresAt < new Date() ||
-          otp.attempts >= 5 ||
-          otp.purpose !== (changeDonor ? "change" : "login") ||
-          (changeDonor && otp.donorId !== changeDonor.id)
-        )
-          return null;
-        await tx.otp.update({
-          where: { phone },
-          data: { attempts: { increment: 1 } },
-        });
-        if (
-          !/^\d{6}$/.test(String(body.code)) ||
-          otp.codeHash !== secretHash(phone + body.code)
-        )
-          return null;
-        await tx.otp.delete({ where: { phone } });
-        if (changeDonor) {
-          const existing = await tx.donor.findUnique({ where: { phone } });
-          if (existing && existing.id !== changeDonor.id)
-            throw new Error("This number is already registered.");
-          await tx.session.deleteMany({ where: { donorId: changeDonor.id } });
-          return tx.donor.update({
-            where: { id: changeDonor.id },
-            data: { phone, phoneVerifiedAt: new Date() },
-          });
-        }
-        return tx.donor.upsert({
-          where: { phone },
-          create: { phone, phoneVerifiedAt: new Date() },
-          update: { phoneVerifiedAt: new Date() },
-        });
-      });
-      if (!result)
-        throw new Error(
-          "Invalid or expired code. Request a new code if needed.",
-        );
-      await createSession(result.id);
-      return NextResponse.json({
-        redirect: result.name ? "/dashboard" : "/dashboard/profile",
-      });
-    }
     if (action === "contact") {
       const body = await req.json();
       await rateLimit("contact:" + requestIp(req), 20, 3600);
@@ -180,13 +77,11 @@ async function handle(
       return NextResponse.json(donor);
     }
     const donor = await requireDonor();
-    if (action === "logout") {
-      const token = await sessionToken();
-      if (token)
-        await db().session.deleteMany({ where: { tokenHash: hash(token) } });
-      (await cookies()).delete("jd_session");
-      return NextResponse.json({ ok: true });
-    }
+    if (action === "logout")
+      return getAuth().api.signOut({
+        headers: await headers(),
+        asResponse: true,
+      });
     if (action === "status") {
       const body = await req.json();
       if (
@@ -196,7 +91,7 @@ async function handle(
         throw new Error("Invalid status.");
       if (
         body.visible &&
-        (!donor.consentAt || !donor.name || !donor.bloodGroup)
+        (!donor.consentAt || !donor.name || !donor.bloodGroup || !donor.phone)
       )
         throw new Error("Complete your profile and consent before publishing.");
       await db().donor.update({
@@ -213,10 +108,15 @@ async function handle(
           "Choose a locality or enter your private area fallback.",
         );
       const { consent, ...data } = parsed;
+      const canonical = normalizePhone(parsed.phone);
+      if (!donor.userId) throw new Error("Please log in again.");
       await db().donor.update({
         where: { id: donor.id },
         data: {
           ...data,
+          phone: canonical,
+          phoneVerifiedAt:
+            donor.phone === canonical ? donor.phoneVerifiedAt : null,
           consentAt: consent ? donor.consentAt || new Date() : null,
         },
       });
@@ -313,12 +213,9 @@ async function handle(
             create: { url: donor.imageUrl },
             update: {},
           });
-        await tx.otp.deleteMany({
-          where: { OR: [{ phone: donor.phone }, { donorId: donor.id }] },
-        });
-        await tx.donor.delete({ where: { id: donor.id } });
+        if (!donor.userId) throw new Error("Account unavailable.");
+        await tx.user.delete({ where: { id: donor.userId } });
       });
-      (await cookies()).delete("jd_session");
       if (donor.imageUrl) await cleanup(donor.imageUrl);
       return NextResponse.json({ ok: true });
     }

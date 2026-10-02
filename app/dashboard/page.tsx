@@ -13,7 +13,7 @@ export default async function Dashboard() {
           Keep your profile current, and your donation memories in one place.
         </p>
       </div>
-      {!d.name && (
+      {(!d.bloodGroup || !d.phone) && (
         <div className="notice">
           Complete your profile to join the directory.{" "}
           <Link href="/dashboard/profile">Set up my profile →</Link>

@@ -1,6 +1,6 @@
-import { createHash, createHmac, randomBytes } from "node:crypto";
-import { sealData, unsealData } from "iron-session";
-import { cookies } from "next/headers";
+import { createHash, createHmac } from "node:crypto";
+import { headers } from "next/headers";
+import { getAuth } from "./auth";
 import { db } from "./db";
 export const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 export function secretHash(s: string) {
@@ -9,52 +9,20 @@ export function secretHash(s: string) {
     throw new Error("Set AUTH_SECRET to at least 32 random characters.");
   return createHmac("sha256", secret).update(s).digest("hex");
 }
-function authSecret() {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret || secret.length < 32)
-    throw new Error("Set AUTH_SECRET to at least 32 random characters.");
-  return secret;
-}
-export async function sessionToken() {
-  const sealed = (await cookies()).get("jd_session")?.value;
-  if (!sealed) return null;
-  const value = await unsealData<{ token?: string }>(sealed, {
-    password: authSecret(),
-    ttl: 30 * 86400,
-  });
-  return value.token || null;
-}
 export async function currentDonor() {
-  const token = await sessionToken();
-  if (!token) return null;
-  const session = await db().session.findUnique({
-    where: { tokenHash: hash(token) },
-    include: { donor: true },
+  if (!(await headers()).get("cookie")) return null;
+  const session = await getAuth().api.getSession({ headers: await headers() });
+  if (!session) return null;
+  return db().donor.upsert({
+    where: { userId: session.user.id },
+    create: { userId: session.user.id, name: session.user.name },
+    update: {},
   });
-  return session && session.expiresAt > new Date() ? session.donor : null;
 }
 export async function requireDonor() {
   const donor = await currentDonor();
   if (!donor) throw new Error("Please log in to continue.");
   return donor;
-}
-export async function createSession(donorId: string) {
-  const token = randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + 30 * 86400000);
-  await db().session.create({
-    data: { tokenHash: hash(token), donorId, expiresAt },
-  });
-  const sealed = await sealData(
-    { token },
-    { password: authSecret(), ttl: 30 * 86400 },
-  );
-  (await cookies()).set("jd_session", sealed, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    expires: expiresAt,
-  });
 }
 export async function rateLimit(key: string, max: number, seconds: number) {
   const safe = secretHash(key);

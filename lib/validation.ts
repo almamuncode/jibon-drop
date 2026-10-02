@@ -30,6 +30,7 @@ export function normalizePhone(input: string) {
 export const profileSchema = z
   .object({
     name: z.string().trim().min(2).max(80),
+    phone: z.string().trim().min(1).max(40),
     bloodGroup: z.enum(bloodGroups),
     divisionId: z.string().min(1),
     districtId: z.string().min(1),
@@ -66,12 +67,16 @@ export const donationSchema = z.object({
   note: z.string().trim().max(500).optional(),
   submissionId: z.string().uuid(),
 });
-export function mockEnabled(env = process.env) {
-  if (env.SMS_PROVIDER === "mock" && env.NODE_ENV === "production")
-    throw new Error("Mock OTP is forbidden in production.");
-  return (
-    env.SMS_PROVIDER === "mock" &&
-    env.NODE_ENV === "development" &&
-    env.ENABLE_DEV_OTP === "true"
-  );
-}
+
+export const registrationSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.email().trim().toLowerCase().max(254),
+  username: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(3)
+    .max(30)
+    .regex(/^[a-z0-9_]+$/),
+  password: z.string().min(10).max(128),
+});

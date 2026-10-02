@@ -1,4 +1,4 @@
 import next from "eslint-config-next/core-web-vitals";
-const config = [...next, { ignores: [".next/**"] }];
+const config = [...next, { ignores: [".next/**", ".next-test/**"] }];
 
 export default config;

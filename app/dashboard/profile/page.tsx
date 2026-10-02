@@ -21,7 +21,7 @@ export default async function EditProfile() {
           visible: d.visible,
           consent: !!d.consentAt,
           hasPhoto: !!d.imageUrl,
-          phone: d.phone,
+          phone: d.phone || "",
         }}
       />
     </div>
