@@ -41,6 +41,7 @@ model Donor {
  available Boolean @default(true)
  visible Boolean @default(false)
  sharePhone Boolean @default(true)
+ phonePublic Boolean @default(false)
  moderationBlocked Boolean @default(false)
  consentAt DateTime?
  createdAt DateTime @default(now())

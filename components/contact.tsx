@@ -102,6 +102,23 @@ export function Contact({ publicId }: { publicId: string }) {
                 </button>
               </form>
             )}
+          {request?.status === "PUBLIC" && !phone && (
+            <>
+              <p>
+                {t(
+                  "This donor shares their number with signed-in users. Contact respectfully.",
+                )}
+              </p>
+              <button
+                className="button secondary"
+                disabled={busy}
+                onClick={() => perform("reveal")}
+              >
+                <Phone size={16} />
+                {busy ? t("Checking…") : t("View phone number")}
+              </button>
+            </>
+          )}
           {request?.status === "PENDING" && (
             <>
               <p>
@@ -181,7 +198,7 @@ export function Contact({ publicId }: { publicId: string }) {
               {busy ? t("Checking…") : t("Check request status")}
             </button>
           )}
-          {request?.id && (
+          {request?.id && request.status !== "PUBLIC" && (
             <ReportAbuse
               contactRequestId={request.id}
               onReported={() => {

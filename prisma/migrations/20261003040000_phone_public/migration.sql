@@ -1,0 +1,1 @@
+ALTER TABLE "Donor" ADD COLUMN "phonePublic" BOOLEAN NOT NULL DEFAULT false;

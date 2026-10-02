@@ -18,6 +18,7 @@ type Profile = {
   fallbackArea: string | null;
   visible: boolean;
   sharePhone: boolean;
+  phonePublic: boolean;
   available: boolean;
   consent: boolean;
   hasPhoto: boolean;
@@ -62,7 +63,13 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           </div>
           <div>
             <dt>{t("Phone sharing")}</dt>
-            <dd>{p.sharePhone ? t("Only with my approval") : t("Disabled")}</dd>
+            <dd>
+              {!p.sharePhone
+                ? t("Disabled")
+                : p.phonePublic
+                  ? t("Visible to signed-in users")
+                  : t("Only with my approval")}
+            </dd>
           </div>
           <div>
             <dt>{t("Directory listing")}</dt>
@@ -113,6 +120,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
               available: f.get("available") === "on",
               visible: f.get("visible") === "on",
               sharePhone: f.get("sharePhone") === "on",
+              phonePublic: f.get("phonePublic") === "on",
               consent: f.get("consent") === "on",
             });
             setMessage(t("Profile saved."));
@@ -213,6 +221,19 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
         <p className="muted">
           {t(
             "Turning this off revokes approved access. Your directory listing can stay visible.",
+          )}
+        </p>
+        <label className="check">
+          <input
+            name="phonePublic"
+            type="checkbox"
+            defaultChecked={p.phonePublic}
+          />
+          {t("Show my number to signed-in users without asking me first.")}
+        </label>
+        <p className="muted">
+          {t(
+            "Leave this off to keep your number private until you approve each request. Visitors who are not signed in never see it.",
           )}
         </p>
         <label className="check">

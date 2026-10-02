@@ -119,11 +119,13 @@ async function handle(
           where: { id: donor.id },
         });
         const sharePhone = parsed.sharePhone ?? current.sharePhone;
+        const phonePublic = parsed.phonePublic ?? current.phonePublic;
         await tx.donor.update({
           where: { id: donor.id },
           data: {
             ...data,
             sharePhone,
+            phonePublic,
             phone: canonical,
             phoneVerifiedAt:
               current.phone === canonical ? current.phoneVerifiedAt : null,

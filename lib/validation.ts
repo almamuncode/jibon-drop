@@ -40,6 +40,7 @@ export const profileSchema = z
     available: z.boolean(),
     visible: z.boolean(),
     sharePhone: z.boolean().optional(),
+    phonePublic: z.boolean().optional(),
     consent: z.boolean(),
   })
   .refine((v) => !v.visible || v.consent, {

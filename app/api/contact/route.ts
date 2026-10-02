@@ -21,7 +21,7 @@ export async function GET(req: Request) {
         sharePhone: true,
         publicId: new URL(req.url).searchParams.get("publicId") || "",
       },
-      select: { id: true, userId: true },
+      select: { id: true, userId: true, phonePublic: true },
     });
     if (!donor)
       throw new ContactError(
@@ -30,6 +30,11 @@ export async function GET(req: Request) {
       );
     if (donor.userId === user.id)
       throw new ContactError("This is your own donor profile.");
+    if (donor.phonePublic)
+      return Response.json(
+        { status: "PUBLIC" },
+        { headers: { "Cache-Control": "no-store" } },
+      );
     const request = await db().contactRequest.findUnique({
       where: {
         donorId_requesterId: { donorId: donor.id, requesterId: user.id },
@@ -69,6 +74,11 @@ export async function POST(req: Request) {
         );
       if (donor.userId === user.id)
         throw new ContactError("This is your own donor profile.");
+      if (donor.phonePublic) {
+        // Public numbers are revealed only on an explicit, rate-limited, signed-in reveal.
+        if (body.intent !== "reveal") return { status: "PUBLIC" };
+        return { phone: donor.phone, status: "PUBLIC" };
+      }
       const where = {
         donorId_requesterId: { donorId: donor.id, requesterId: user.id },
       };

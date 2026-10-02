@@ -42,6 +42,13 @@ export const bangla: Record<string, string> = {
   "Phone sharing": "ফোন নম্বর শেয়ার",
   "Only with my approval": "শুধু আমার অনুমোদনে",
   Disabled: "বন্ধ",
+  "Visible to signed-in users": "লগইন করা ব্যবহারকারীদের জন্য দৃশ্যমান",
+  "Show my number to signed-in users without asking me first.":
+    "আমাকে জিজ্ঞাসা না করেই লগইন করা ব্যবহারকারীদের আমার নম্বর দেখান।",
+  "Leave this off to keep your number private until you approve each request. Visitors who are not signed in never see it.":
+    "প্রতিটি অনুরোধ অনুমোদন না করা পর্যন্ত নম্বর গোপন রাখতে এটি বন্ধ রাখুন। লগইন না করা দর্শকরা কখনও এটি দেখেন না।",
+  "This donor shares their number with signed-in users. Contact respectfully.":
+    "এই রক্তদাতা লগইন করা ব্যবহারকারীদের সাথে নম্বর শেয়ার করেন। সম্মানের সাথে যোগাযোগ করুন।",
   "Cancel report": "অভিযোগ বাতিল",
   "Report abuse": "অপব্যবহারের অভিযোগ",
   "Report sent to administrators. Contact access has been revoked.":

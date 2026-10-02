@@ -79,6 +79,10 @@ The request is saved even if email fails. Delivery status (`PENDING`, `SENT`, `F
 
 Setup: run `npm run db:migrate`, then set `RESEND_API_KEY`, `EMAIL_FROM` (a sender on your verified Resend domain) and `BETTER_AUTH_URL`. Run `npm test` for the authorization, unread-count, email-failure and duplicate-prevention tests (in-memory PGlite and a mocked mailer; no real email is sent).
 
+## Phone visibility
+
+Donors choose how their number is shared. By default it is private: a signed-in person sends a request and the donor approves it. A donor can tick "Show my number to signed-in users" on the profile to skip approval. Public numbers are never shown to signed-out visitors or in listings; they are returned only by a signed-in, rate-limited reveal. Existing donors stay private. Apply the `phone_public` migration with `npm run db:migrate`.
+
 ## Administration
 
 Apply migrations (`npm run db:migrate`) before starting the updated app. Register your own account, then grant its admin role from a trusted terminal:
