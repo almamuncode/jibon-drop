@@ -1,0 +1,85 @@
+generator client {
+ provider = "prisma-client-js"
+}
+datasource db {
+ provider = "postgresql"
+}
+model Location {
+ id String @id
+ name String
+ bnName String?
+ type String
+ parentId String?
+ parent Location? @relation("Hierarchy", fields: [parentId], references: [id])
+ children Location[] @relation("Hierarchy")
+ divisionDonors Donor[] @relation("DivisionDonors")
+ districtDonors Donor[] @relation("DistrictDonors")
+ localityDonors Donor[] @relation("LocalityDonors")
+ areaDonors Donor[] @relation("AreaDonors")
+ source String
+ @@index([parentId, type])
+}
+model Donor {
+ id String @id @default(cuid())
+ publicId String @unique @default(uuid())
+ phone String @unique
+ phoneVerifiedAt DateTime
+ name String @default("")
+ bloodGroup String @default("")
+ divisionId String?
+ districtId String?
+ localityId String?
+ areaId String?
+ division Location? @relation("DivisionDonors", fields:[divisionId], references:[id])
+ district Location? @relation("DistrictDonors", fields:[districtId], references:[id])
+ locality Location? @relation("LocalityDonors", fields:[localityId], references:[id])
+ area Location? @relation("AreaDonors", fields:[areaId], references:[id])
+ fallbackArea String?
+ imageUrl String?
+ available Boolean @default(true)
+ visible Boolean @default(false)
+ consentAt DateTime?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ sessions Session[]
+ donations Donation[]
+ donationCount Int @default(0)
+ lastDonation DateTime? @db.Date
+ @@index([bloodGroup, visible, divisionId, districtId, localityId, areaId])
+}
+model Session {
+ tokenHash String @id
+ donorId String
+ donor Donor @relation(fields: [donorId], references: [id], onDelete: Cascade)
+ expiresAt DateTime
+ @@index([donorId])
+}
+model Otp {
+ phone String @id
+ codeHash String
+ expiresAt DateTime
+ sentAt DateTime
+ attempts Int @default(0)
+ purpose String
+ donorId String?
+}
+model Donation {
+ id String @id @default(uuid())
+ donorId String
+ donor Donor @relation(fields: [donorId], references: [id], onDelete: Cascade)
+ date DateTime @db.Date
+ hospital String?
+ note String?
+ submissionId String @unique
+ @@index([donorId, date])
+}
+model RateLimit {
+ key String @id
+ count Int
+ resetAt DateTime
+}
+model BlobCleanup {
+ id String @id @default(cuid())
+ url String @unique
+ createdAt DateTime @default(now())
+}
