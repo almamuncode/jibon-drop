@@ -40,6 +40,7 @@ model Donor {
  imageUrl String?
  available Boolean @default(true)
  visible Boolean @default(false)
+ moderationBlocked Boolean @default(false)
  consentAt DateTime?
  createdAt DateTime @default(now())
  updatedAt DateTime @updatedAt
@@ -50,6 +51,8 @@ model Donor {
  @@index([bloodGroup, visible, divisionId, districtId, localityId, areaId])
 }
 model User {
+ role String @default("USER")
+ suspended Boolean @default(false)
  id String @id
  name String
  email String @unique
@@ -121,4 +124,14 @@ model BlobCleanup {
  id String @id @default(cuid())
  url String @unique
  createdAt DateTime @default(now())
+}
+
+model AdminAudit {
+ id String @id @default(cuid())
+ actorId String
+ targetId String
+ action String
+ reason String
+ createdAt DateTime @default(now())
+ @@index([createdAt])
 }

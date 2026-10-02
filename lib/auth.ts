@@ -20,6 +20,20 @@ function createAuth() {
     throw new Error("Set BETTER_AUTH_URL to your production website origin.");
   return betterAuth({
     logger: { disabled: true },
+    databaseHooks: {
+      session: {
+        create: {
+          before: async (session) => {
+            const user = await db().user.findUnique({
+              where: { id: session.userId },
+              select: { suspended: true },
+            });
+            if (!user || user.suspended) return false;
+            return { data: session };
+          },
+        },
+      },
+    },
     secret,
     baseURL,
     database: prismaAdapter(db(), { provider: "postgresql" }),

@@ -13,6 +13,11 @@ export async function currentDonor() {
   if (!(await headers()).get("cookie")) return null;
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) return null;
+  const user = await db().user.findUnique({
+    where: { id: session.user.id },
+    select: { suspended: true },
+  });
+  if (!user || user.suspended) return null;
   return db().donor.upsert({
     where: { userId: session.user.id },
     create: { userId: session.user.id, name: session.user.name },

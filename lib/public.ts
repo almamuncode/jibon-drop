@@ -14,6 +14,8 @@ export const publicSelect = {
 } as const;
 export const published = {
   visible: true,
+  moderationBlocked: false,
+  user: { suspended: false },
   userId: { not: null },
   phone: { not: null },
   consentAt: { not: null },

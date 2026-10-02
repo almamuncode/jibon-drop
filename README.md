@@ -70,3 +70,13 @@ Configure DATABASE_URL, AUTH_SECRET, BETTER_AUTH_URL, GOOGLE_CLIENT_ID/GOOGLE_CL
 Remaining external setup: database migrations/credentials, Google OAuth registration, optional Blob configuration, scheduled cleanup. Google OAuth was implemented but needs real credentials to verify a live Google callback. Manual sign-up/login has no SMS charge. UI copy uses simple English with Bangla location names; shared copy is in lib/copy.ts and page-specific strings are colocated for later translation.
 
 References: [Better Auth Next.js](https://better-auth.com/docs/integrations/next), [Google](https://better-auth.com/docs/authentication/google), [email/password](https://better-auth.com/docs/authentication/email-password), [username plugin](https://better-auth.com/docs/plugins/username).
+
+## Administration
+
+Apply migrations (`npm run db:migrate`) before starting the updated app. Register your own account, then grant its admin role from a trusted terminal:
+
+```sh
+npm run admin:grant -- your-account@example.com
+```
+
+Open `/admin` or choose Administration in the avatar menu. Administrators can search accounts, inspect donor details and recent donation records, block/restore listings, suspend/reactivate accounts, grant/remove admin roles, and remove incorrect donation records. Every change requires a reason and is recorded in `/admin/audit`. Suspension revokes all sessions and prevents new sign-ins. Listing blocks remain effective even if the donor edits their visibility. Restoring a listing does not override the donor’s consent or privacy choices. Administrators cannot suspend themselves or remove their own role. Password hashes, session tokens and OAuth credentials are never displayed.

@@ -17,10 +17,12 @@ export function AccountMenu({
   name,
   email,
   image,
+  isAdmin = false,
 }: {
   name: string;
   email: string;
   image: string | null;
+  isAdmin?: boolean;
 }) {
   const menu = useRef<HTMLDetailsElement>(null);
   const router = useRouter();
@@ -62,6 +64,9 @@ export function AccountMenu({
           <span>{email}</span>
         </div>
         {[
+          ...(isAdmin
+            ? [{ href: "/admin", label: "Administration", icon: Settings }]
+            : []),
           { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
           { href: "/dashboard/profile", label: "My profile", icon: UserRound },
           { href: "/dashboard/settings", label: "Settings", icon: Settings },

@@ -29,12 +29,17 @@ export async function AuthNavigation() {
         <Link href="/login">Login</Link>
       </>
     );
+  const user = await db().user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
   const donor = await db().donor.findUnique({
     where: { userId: session.user.id },
     select: { name: true, imageUrl: true },
   });
   return (
     <AccountMenu
+      isAdmin={user?.role === "ADMIN"}
       name={donor?.name || session.user.name}
       email={session.user.email}
       image={donor?.imageUrl || session.user.image || null}
