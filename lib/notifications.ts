@@ -38,7 +38,13 @@ export function createNotification(
 }
 
 export function unreadCount(userId: string) {
-  return db().notification.count({ where: { userId, readAt: null } });
+  return db().notification.count({
+    where: {
+      userId,
+      readAt: null,
+      contactRequest: { status: "PENDING" },
+    },
+  });
 }
 
 export async function markRead(userId: string, id: string) {
@@ -62,7 +68,11 @@ export async function markRequestRead(
 
 export async function unreadRequestIds(userId: string) {
   const rows = await db().notification.findMany({
-    where: { userId, readAt: null },
+    where: {
+      userId,
+      readAt: null,
+      contactRequest: { status: "PENDING" },
+    },
     select: { contactRequestId: true },
   });
   return new Set(rows.map((row) => row.contactRequestId));

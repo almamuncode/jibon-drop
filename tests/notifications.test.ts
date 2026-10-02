@@ -203,6 +203,26 @@ describe("donor notifications", () => {
     expect(await lib.unreadCount(ids.donor)).toBe(1);
   });
 
+  it("excludes unread notifications for requests that are no longer pending", async () => {
+    await sendRequest();
+    await flush();
+    const request = await client.contactRequest.findFirstOrThrow();
+    await client.contactRequest.update({
+      where: { id: request.id },
+      data: { status: "REVOKED" },
+    });
+    expect(await lib.unreadCount(ids.donor)).toBe(0);
+    expect(await lib.unreadRequestIds(ids.donor)).toEqual(new Set());
+    expect(
+      await countRoute.GET(get("/api/notifications", ids.donor)),
+    ).toHaveProperty("status", 200);
+    expect(
+      await (
+        await countRoute.GET(get("/api/notifications", ids.donor))
+      ).json(),
+    ).toEqual({ unread: 0 });
+  });
+
   it("enforces authentication and ownership on the API", async () => {
     await sendRequest();
     await flush();
