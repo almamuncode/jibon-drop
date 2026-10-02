@@ -14,6 +14,7 @@ import {
 import {
   donationSchema,
   normalizePhone,
+  normalizeFacebook,
   profileSchema,
 } from "@/lib/validation";
 import { validateHierarchy } from "@/lib/public";
@@ -110,7 +111,8 @@ async function handle(
         throw new Error(
           "Choose a locality or enter your private area fallback.",
         );
-      const { consent, ...data } = parsed;
+      const { consent, facebook: facebookInput, ...data } = parsed;
+      const facebook = normalizeFacebook(facebookInput ?? "");
       const canonical = normalizePhone(parsed.phone);
       if (!donor.userId) throw new Error("Please log in again.");
       await db().$transaction(async (tx) => {
@@ -126,6 +128,7 @@ async function handle(
             ...data,
             sharePhone,
             phonePublic,
+            facebook,
             phone: canonical,
             phoneVerifiedAt:
               current.phone === canonical ? current.phoneVerifiedAt : null,

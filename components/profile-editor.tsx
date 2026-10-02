@@ -8,6 +8,7 @@ import { PhotoEditor } from "./photo";
 import { api } from "./dashboard";
 import { bloodGroups } from "@/lib/validation";
 import { Avatar } from "./ui";
+import { FacebookIcon } from "./facebook-icon";
 type Profile = {
   name: string;
   bloodGroup: string;
@@ -19,6 +20,7 @@ type Profile = {
   visible: boolean;
   sharePhone: boolean;
   phonePublic: boolean;
+  facebook: string;
   available: boolean;
   consent: boolean;
   hasPhoto: boolean;
@@ -56,6 +58,10 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           <div>
             <dt>{t("Contact number")}</dt>
             <dd>{p.phone || t("Not added")}</dd>
+          </div>
+          <div>
+            <dt>Facebook</dt>
+            <dd>{p.facebook || t("Not added")}</dd>
           </div>
           <div>
             <dt>{t("Availability")}</dt>
@@ -121,6 +127,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
               visible: f.get("visible") === "on",
               sharePhone: f.get("sharePhone") === "on",
               phonePublic: f.get("phonePublic") === "on",
+              facebook: f.get("facebook") || null,
               consent: f.get("consent") === "on",
             });
             setMessage(t("Profile saved."));
@@ -157,6 +164,32 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           {t(
             "Used for donor contact, never for login. Numbers are self-reported and not verified by JibonDrop.",
           )}{" "}
+        </p>
+        <label htmlFor="facebook">{t("Facebook (optional)")}</label>
+        <div className="facebook-field">
+          <a
+            className="button secondary"
+            href="https://www.facebook.com/me"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t("Open Facebook to copy your profile link")}
+          >
+            <FacebookIcon />
+          </a>
+          <input
+            id="facebook"
+            name="facebook"
+            maxLength={200}
+            defaultValue={p.facebook}
+            placeholder={t("username or facebook.com link")}
+            autoCapitalize="none"
+            autoCorrect="off"
+          />
+        </div>
+        <p className="muted">
+          {t(
+            "Tap the icon to open Facebook, copy your profile link, then paste it here. It is shared the same way as your phone number.",
+          )}
         </p>
         <label htmlFor="profile-blood">{t("Blood group")}</label>
         <select

@@ -42,6 +42,7 @@ model Donor {
  visible Boolean @default(false)
  sharePhone Boolean @default(true)
  phonePublic Boolean @default(false)
+ facebook String?
  moderationBlocked Boolean @default(false)
  consentAt DateTime?
  createdAt DateTime @default(now())

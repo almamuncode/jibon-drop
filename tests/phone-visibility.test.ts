@@ -144,3 +144,34 @@ describe("public phone numbers", () => {
     expect(codes).toContain(429);
   });
 });
+
+describe("facebook sharing", () => {
+  it("normalizes usernames and profile links", async () => {
+    const { normalizeFacebook } = await import("../lib/validation");
+    expect(normalizeFacebook("")).toBeNull();
+    expect(normalizeFacebook("@john.doe")).toBe("john.doe");
+    expect(
+      normalizeFacebook("https://www.facebook.com/john.doe?mibextid=1"),
+    ).toBe("john.doe");
+    expect(normalizeFacebook("m.facebook.com/john.doe/")).toBe("john.doe");
+    expect(
+      normalizeFacebook("https://facebook.com/profile.php?id=1000123456"),
+    ).toBe("id:1000123456");
+    for (const bad of [
+      "a b",
+      "ab",
+      "https://evil.com/john.doe",
+      "john/../x",
+      "javascript:alert(1)",
+    ])
+      expect(() => normalizeFacebook(bad)).toThrow();
+  });
+
+  it("is revealed only with an approved or public number", async () => {
+    await client.donor.updateMany({ data: { facebook: "john.doe" } });
+    expect((await reveal(viewer)).status).toBe(403);
+    await client.donor.updateMany({ data: { phonePublic: true } });
+    expect((await reveal(null)).status).toBe(401);
+    expect((await (await reveal(viewer)).json()).facebook).toBe("john.doe");
+  });
+});

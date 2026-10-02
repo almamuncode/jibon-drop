@@ -81,7 +81,7 @@ Setup: run `npm run db:migrate`, then set `RESEND_API_KEY`, `EMAIL_FROM` (a send
 
 ## Phone visibility
 
-Donors choose how their number is shared. By default it is private: a signed-in person sends a request and the donor approves it. A donor can tick "Show my number to signed-in users" on the profile to skip approval. Public numbers are never shown to signed-out visitors or in listings; they are returned only by a signed-in, rate-limited reveal. Existing donors stay private. Apply the `phone_public` migration with `npm run db:migrate`.
+Donors choose how their number is shared. By default it is private: a signed-in person sends a request and the donor approves it. A donor can tick "Show my number to signed-in users" on the profile to skip approval. Public numbers are never shown to signed-out visitors or in listings; they are returned only by a signed-in, rate-limited reveal. Donors can also add an optional Facebook username or profile link (with an icon that opens Facebook so they can copy it); it is revealed together with the number, under the same rules. Existing donors stay private. Apply the `phone_public` and `donor_facebook` migrations with `npm run db:migrate`.
 
 ## Administration
 

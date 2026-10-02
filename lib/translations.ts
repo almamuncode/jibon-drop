@@ -42,6 +42,15 @@ export const bangla: Record<string, string> = {
   "Phone sharing": "ফোন নম্বর শেয়ার",
   "Only with my approval": "শুধু আমার অনুমোদনে",
   Disabled: "বন্ধ",
+  "Facebook (optional)": "ফেসবুক (ঐচ্ছিক)",
+  "Open Facebook to copy your profile link":
+    "প্রোফাইল লিংক কপি করতে ফেসবুক খুলুন",
+  "username or facebook.com link": "ইউজারনেম বা facebook.com লিংক",
+  "Tap the icon to open Facebook, copy your profile link, then paste it here. It is shared the same way as your phone number.":
+    "আইকনে ট্যাপ করে ফেসবুক খুলুন, প্রোফাইল লিংক কপি করে এখানে পেস্ট করুন। এটি ফোন নম্বরের মতোই শেয়ার হবে।",
+  "Open Facebook profile": "ফেসবুক প্রোফাইল খুলুন",
+  "Enter a valid Facebook username or profile link.":
+    "সঠিক ফেসবুক ইউজারনেম বা প্রোফাইল লিংক দিন।",
   "Visible to signed-in users": "লগইন করা ব্যবহারকারীদের জন্য দৃশ্যমান",
   "Show my number to signed-in users without asking me first.":
     "আমাকে জিজ্ঞাসা না করেই লগইন করা ব্যবহারকারীদের আমার নম্বর দেখান।",

@@ -3,11 +3,13 @@ import { useTranslation } from "@/components/language";
 import { useState } from "react";
 import Link from "next/link";
 import { Phone, Copy } from "lucide-react";
+import { FacebookIcon } from "./facebook-icon";
 import { ReportAbuse } from "./report-abuse";
 type RequestStatus = { id?: string; status: string; expiresAt?: string | null };
 export function Contact({ publicId }: { publicId: string }) {
   const t = useTranslation();
   const [phone, setPhone] = useState("");
+  const [facebook, setFacebook] = useState("");
   const [request, setRequest] = useState<RequestStatus | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -16,6 +18,7 @@ export function Contact({ publicId }: { publicId: string }) {
     setBusy(true);
     setMessage("");
     setPhone("");
+    setFacebook("");
     try {
       const response = await fetch(
         intent
@@ -37,6 +40,7 @@ export function Contact({ publicId }: { publicId: string }) {
       if (!response.ok) throw new Error(result.error);
       setRequest(result);
       if (result.phone) setPhone(result.phone);
+      if (result.facebook) setFacebook(result.facebook);
       if (intent === "request" && result.status === "PENDING")
         setMessage(
           t("Request sent. The donor will review it in their dashboard."),
@@ -166,6 +170,23 @@ export function Contact({ publicId }: { publicId: string }) {
                 <Phone size={16} />
                 {phone}
               </a>
+              {facebook && (
+                <a
+                  className="button secondary"
+                  href={
+                    facebook.startsWith("id:")
+                      ? "https://www.facebook.com/profile.php?id=" +
+                        facebook.slice(3)
+                      : "https://www.facebook.com/" +
+                        encodeURIComponent(facebook)
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FacebookIcon />
+                  {t("Open Facebook profile")}
+                </a>
+              )}
               <button
                 className="button secondary"
                 onClick={async () => {
@@ -203,6 +224,7 @@ export function Contact({ publicId }: { publicId: string }) {
               contactRequestId={request.id}
               onReported={() => {
                 setPhone("");
+                setFacebook("");
                 setRequest({ ...request, status: "REVOKED" });
               }}
             />

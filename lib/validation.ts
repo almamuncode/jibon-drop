@@ -27,6 +27,26 @@ export function normalizePhone(input: string) {
     throw new Error("Enter a valid Bangladesh mobile number.");
   return phone.number.toString();
 }
+// Accepts a username, @username or a facebook.com / fb.com profile link.
+export function normalizeFacebook(input: string) {
+  const raw = input.trim();
+  if (!raw) return null;
+  const invalid = new Error("Enter a valid Facebook username or profile link.");
+  let path = raw.replace(/^@/, "");
+  if (/^(https?:\/\/)?([a-z0-9-]+\.)?(facebook|fb)\.com\//i.test(raw)) {
+    try {
+      const url = new URL(/^https?:/i.test(raw) ? raw : "https://" + raw);
+      const id = url.pathname === "/profile.php" && url.searchParams.get("id");
+      path = id ? "id:" + id : url.pathname.split("/").filter(Boolean)[0] || "";
+    } catch {
+      throw invalid;
+    }
+  }
+  if (/^id:\d{5,20}$/.test(path)) return path;
+  if (/^[A-Za-z0-9.]{5,50}$/.test(path) && !/\.(php|html?)$/i.test(path))
+    return path;
+  throw invalid;
+}
 export const profileSchema = z
   .object({
     name: z.string().trim().min(2).max(80),
@@ -41,6 +61,7 @@ export const profileSchema = z
     visible: z.boolean(),
     sharePhone: z.boolean().optional(),
     phonePublic: z.boolean().optional(),
+    facebook: z.string().trim().max(200).optional().nullable(),
     consent: z.boolean(),
   })
   .refine((v) => !v.visible || v.consent, {

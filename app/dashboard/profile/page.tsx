@@ -27,6 +27,7 @@ export default async function EditProfile() {
           visible: d.visible,
           sharePhone: d.sharePhone,
           phonePublic: d.phonePublic,
+          facebook: d.facebook || "",
           consent: !!d.consentAt,
           hasPhoto: !!d.imageUrl,
           phone: d.phone || "",

@@ -2083,3 +2083,13 @@ html[lang="bn"] :is(h1, h2, h3) {
 .new-request {
   border-left: 4px solid #c62828;
 }
+
+.facebook-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.facebook-field input {
+  flex: 1;
+  min-width: 0;
+}

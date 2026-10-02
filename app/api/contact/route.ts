@@ -77,7 +77,11 @@ export async function POST(req: Request) {
       if (donor.phonePublic) {
         // Public numbers are revealed only on an explicit, rate-limited, signed-in reveal.
         if (body.intent !== "reveal") return { status: "PUBLIC" };
-        return { phone: donor.phone, status: "PUBLIC" };
+        return {
+          phone: donor.phone,
+          facebook: donor.facebook,
+          status: "PUBLIC",
+        };
       }
       const where = {
         donorId_requesterId: { donorId: donor.id, requesterId: user.id },
@@ -91,6 +95,7 @@ export async function POST(req: Request) {
           );
         return {
           phone: donor.phone,
+          facebook: donor.facebook,
           id: existing.id,
           status: "APPROVED",
           expiresAt: existing.expiresAt,
