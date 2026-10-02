@@ -81,7 +81,7 @@ Setup:
 
 1. Run `npm run db:migrate` (adds the `Notification` table).
 2. Set `RESEND_API_KEY`, `EMAIL_FROM`, `BETTER_AUTH_URL` and `CRON_SECRET` (16+ random characters).
-3. [vercel.json](vercel.json) schedules `GET /api/cron/notifications` every 15 minutes; Vercel sends `Authorization: Bearer $CRON_SECRET` automatically. Sub-daily crons need a Vercel Pro plan; on Hobby change the schedule to daily (`0 3 * * *`) or call the endpoint from another scheduler with the same header. The endpoint rejects requests without the secret.
+3. [vercel.json](vercel.json) schedules `GET /api/cron/notifications` once a day (`0 3 * * *`), the most frequent schedule Vercel Hobby allows; a more frequent expression fails the deployment there. Vercel sends `Authorization: Bearer $CRON_SECRET` automatically. On Pro you can use e.g. `*/15 * * * *`. The endpoint rejects requests without the secret. Failed emails are also attempted once right after the request, so the daily run only catches leftovers.
 
 Notifications emails fail (and are retried) while Resend is not configured. Run `npm test` for authorization, unread-count, email-failure and duplicate-prevention tests (they use an in-memory PGlite database and a mocked mailer, so no real email is sent).
 
