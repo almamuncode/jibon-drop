@@ -1,3 +1,4 @@
+import { getTranslation } from "@/lib/i18n-server";
 import { getAuth, googleConfigured } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -8,24 +9,31 @@ export default async function Login({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const t = await getTranslation();
+
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (session) redirect("/dashboard");
   const error = (await searchParams).error;
   return (
     <div className="container auth-shell">
       <div className="auth-card">
-        <span className="eyebrow">Welcome back</span>
-        <h1>Log in to JibonDrop</h1>
-        <p>Sign in with Google, or use your email or username and password.</p>
+        <span className="eyebrow">{t("Welcome back")}</span>
+        <h1>{t("Log in to JibonDrop")}</h1>
+        <p>
+          {t(
+            "Sign in with Google, or use your email or username and password.",
+          )}
+        </p>
         {error && (
           <p className="error" role="alert">
-            Google sign-in could not be completed. Try again or use your
-            password.
+            {t(
+              "Google sign-in could not be completed. Try again or use your password.",
+            )}{" "}
           </p>
         )}
         <AuthForm googleEnabled={googleConfigured()} />
         <p className="muted">
-          New here? <Link href="/register">Become a donor</Link>
+          {t("New here?")} <Link href="/register">{t("Become a donor")}</Link>
         </p>
       </div>
     </div>

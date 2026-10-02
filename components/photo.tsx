@@ -1,24 +1,29 @@
 "use client";
+import { useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-export async function compressPhoto(file: File) {
+export async function compressPhoto(
+  file: File,
+  t: (text: string) => string = (text) => text,
+) {
   if (
     !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
     file.size > 10000000
   )
-    throw new Error("Choose a static JPEG, PNG or WebP under 10 MB.");
+    throw new Error(t("Choose a static JPEG, PNG or WebP under 10 MB."));
   const bytes = new Uint8Array(await file.arrayBuffer());
   const ascii = new TextDecoder("latin1").decode(bytes);
   if (
     (file.type === "image/png" && ascii.includes("acTL")) ||
     (file.type === "image/webp" && ascii.includes("ANIM"))
   )
-    throw new Error("Animated images are not supported.");
+    throw new Error(t("Animated images are not supported."));
   const bitmap = await createImageBitmap(file);
   if (bitmap.width * bitmap.height > 40000000) {
     bitmap.close();
-    throw new Error("Choose a smaller image (under 40 megapixels).");
+    throw new Error(t("Choose a smaller image (under 40 megapixels)."));
   }
   try {
     for (let size = 512; size >= 128; size = Math.floor(size * 0.75)) {
@@ -46,13 +51,17 @@ export async function compressPhoto(file: File) {
       }
     }
     throw new Error(
-      "Could not compress this photo under 100 KB. Try a different image or skip it.",
+      t(
+        "Could not compress this photo under 100 KB. Try a different image or skip it.",
+      ),
     );
   } finally {
     bitmap.close();
   }
 }
 export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
+  const t = useTranslation();
+
   const router = useRouter();
   const [preview, setPreview] = useState("");
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -69,7 +78,7 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
-      setMessage(remove ? "Photo removed." : "Photo saved.");
+      setMessage(remove ? t("Photo removed.") : t("Photo saved."));
       setBlob(null);
       router.refresh();
     } catch (e) {
@@ -80,12 +89,13 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
   }
   return (
     <section className="photo-editor">
-      <h3>Profile photo (optional)</h3>
+      <h3>{t("Profile photo (optional)")}</h3>
       <p className="muted">
-        Your photo is public when your listing is visible. Images are cropped to
-        a centered square and compressed to at most 100 KB.
+        {t(
+          "Your photo is public when your listing is visible. Images are cropped to a centered square and compressed to at most 100 KB.",
+        )}{" "}
       </p>
-      <label htmlFor="photo">Choose a static JPEG, PNG or WebP</label>
+      <label htmlFor="photo">{t("Choose a static JPEG, PNG or WebP")}</label>
       <input
         id="photo"
         type="file"
@@ -95,12 +105,12 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
           if (!file) return;
           setBusy(true);
           try {
-            const compressed = await compressPhoto(file);
+            const compressed = await compressPhoto(file, t);
             if (preview) URL.revokeObjectURL(preview);
             setPreview(URL.createObjectURL(compressed));
             setBlob(compressed);
             setMessage(
-              "Preview ready. " + Math.ceil(compressed.size / 1000) + " KB",
+              t("Preview ready. ") + Math.ceil(compressed.size / 1000) + " KB",
             );
           } catch (e) {
             setMessage((e as Error).message);
@@ -117,7 +127,7 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
           height={128}
           className="photo-preview"
           src={preview}
-          alt="Compressed profile photo preview"
+          alt={t("Compressed profile photo preview")}
         />
       )}
       <div className="actions">
@@ -128,7 +138,7 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
             disabled={busy}
             onClick={() => upload()}
           >
-            Save photo
+            {t("Save photo")}{" "}
           </button>
         )}
         {hasPhoto && (
@@ -138,7 +148,7 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
             disabled={busy}
             onClick={() => upload(true)}
           >
-            Remove photo
+            {t("Remove photo")}{" "}
           </button>
         )}
         <button
@@ -148,14 +158,14 @@ export function PhotoEditor({ hasPhoto }: { hasPhoto: boolean }) {
             setBlob(null);
             setPreview("");
             setMessage(
-              "Photo skipped. Initials will be shown if no photo is saved.",
+              t("Photo skipped. Initials will be shown if no photo is saved."),
             );
           }}
         >
-          Skip photo
+          {t("Skip photo")}{" "}
         </button>
       </div>
-      <p role="status">{message}</p>
+      <p role="status">{t.error(message)}</p>
     </section>
   );
 }

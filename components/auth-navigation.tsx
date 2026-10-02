@@ -1,3 +1,4 @@
+import { getTranslation } from "@/lib/i18n-server";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
@@ -19,14 +20,16 @@ export async function MobileNavigation() {
 }
 
 export async function AuthNavigation() {
+  const t = await getTranslation();
+
   const session = await navigationSession();
   if (!session)
     return (
       <>
         <Link className="nav-donor" href="/register">
-          Become a Donor
+          {t("Become a Donor")}{" "}
         </Link>
-        <Link href="/login">Login</Link>
+        <Link href="/login">{t("Login")}</Link>
       </>
     );
   const user = await db().user.findUnique({

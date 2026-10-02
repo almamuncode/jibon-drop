@@ -1,3 +1,4 @@
+import { getTranslation } from "@/lib/i18n-server";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -8,7 +9,9 @@ import {
   Droplet,
 } from "lucide-react";
 import { SearchForm } from "@/components/search";
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslation();
+
   return (
     <>
       <section className="hero">
@@ -18,50 +21,55 @@ export default function Home() {
           </div>
           <div className="eyebrow">
             <span />
-            Blood donors across Bangladesh
+            {t("Blood donors across Bangladesh")}{" "}
           </div>
           <h1>
-            A little of you.
-            <br />
-            <span>A lifeline for someone.</span>
+            {t("A little of you.")} <br />
+            <span>{t("A lifeline for someone.")}</span>
           </h1>
           <p className="lead">
-            Connect with blood donors near you. Search by blood group and
-            location, then reach out when you need support.
+            {t(
+              "Connect with blood donors near you. Search by blood group and location, then reach out when you need support.",
+            )}{" "}
           </p>
           <Link className="hero-cta" href="/register">
-            Become a donor
-            <ArrowRight size={18} />
+            {t("Become a donor")} <ArrowRight size={18} />
           </Link>
           <div className="trust">
             <ShieldCheck size={19} />
-            <span>Free to search. No account needed.</span>
+            <span>{t("Free to search. No account needed.")}</span>
           </div>
         </div>
         <SearchForm compact />
       </section>
       <section className="how">
         <div className="section-title">
-          <span className="eyebrow">A simple way to help</span>
-          <h2>Find support in three simple steps.</h2>
-          <p>Find the right blood group and reach out directly.</p>
+          <span className="eyebrow">{t("A simple way to help")}</span>
+          <h2>{t("Find support in three simple steps.")}</h2>
+          <p>{t("Find the right blood group and reach out directly.")}</p>
         </div>
         <div className="steps">
           {[
             {
               icon: Search,
-              title: "Find a match",
-              text: "Choose a blood group and narrow your search by location.",
+              title: t("Find a match"),
+              text: t(
+                "Choose a blood group and narrow your search by location.",
+              ),
             },
             {
               icon: Phone,
-              title: "Connect with a donor",
-              text: "View their profile and reveal their number with their consent.",
+              title: t("Connect with a donor"),
+              text: t(
+                "View their profile and reveal their number with their consent.",
+              ),
             },
             {
               icon: HeartHandshake,
-              title: "Coordinate with care",
-              text: "Confirm availability and arrange donation with your blood bank.",
+              title: t("Coordinate with care"),
+              text: t(
+                "Confirm availability and arrange donation with your blood bank.",
+              ),
             },
           ].map((s, i) => (
             <article key={s.title}>
@@ -77,16 +85,16 @@ export default function Home() {
       </section>
       <section className="join">
         <div>
-          <span className="eyebrow">Your willingness matters</span>
-          <h2>Someone nearby may need your help.</h2>
+          <span className="eyebrow">{t("Your willingness matters")}</span>
+          <h2>{t("Someone nearby may need your help.")}</h2>
           <p>
-            Create a donor profile. Choose when you’re available and stay in
-            control of your listing.
+            {t(
+              "Create a donor profile. Choose when you’re available and stay in control of your listing.",
+            )}{" "}
           </p>
         </div>
         <Link className="button" href="/register">
-          Become a donor
-          <ArrowRight size={18} />
+          {t("Become a donor")} <ArrowRight size={18} />
         </Link>
       </section>
     </>

@@ -1,7 +1,11 @@
 "use client";
+import { useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import { Phone, Copy } from "lucide-react";
 export function Contact({ publicId }: { publicId: string }) {
+  const t = useTranslation();
+
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -35,30 +39,31 @@ export function Contact({ publicId }: { publicId: string }) {
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(phone);
-                setMessage("Number copied.");
+                setMessage(t("Number copied."));
               } catch {
                 setMessage(
-                  "Copy is unavailable. Select the number to copy it.",
+                  t("Copy is unavailable. Select the number to copy it."),
                 );
               }
             }}
           >
             <Copy size={16} />
-            Copy
+            {t("Copy")}{" "}
           </button>
           <p className="muted">
-            This number is self-reported and unverified. Contact respectfully.
-            Explain your need and respect the donor’s decision.
+            {t(
+              "This number is self-reported and unverified. Contact respectfully. Explain your need and respect the donor’s decision.",
+            )}{" "}
           </p>
         </>
       ) : (
         <button className="button secondary" disabled={busy} onClick={reveal}>
           <Phone size={16} />
-          {busy ? "Checking…" : "Contact donor"}
+          {busy ? t("Checking…") : t("Contact donor")}
         </button>
       )}
       <p role="status" className="muted">
-        {message}
+        {t.error(message)}
       </p>
     </div>
   );

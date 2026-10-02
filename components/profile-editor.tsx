@@ -1,4 +1,6 @@
 "use client";
+import { useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Locations, LocationValue } from "./locations";
@@ -23,6 +25,8 @@ type Profile = {
   location: string;
 };
 export function ProfileEditor({ profile: p }: { profile: Profile }) {
+  const t = useTranslation();
+
   const router = useRouter();
   const [loc, setLoc] = useState<LocationValue>({
     divisionId: p.divisionId || "",
@@ -40,28 +44,28 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
         <div className="profile-identity">
           <Avatar name={p.name} url={p.imageUrl} />
           <div>
-            <span className="eyebrow">My donor profile</span>
-            <h2>{p.name || "Complete your profile"}</h2>
-            <p>{p.location || "Location not set"}</p>
+            <span className="eyebrow">{t("My donor profile")}</span>
+            <h2>{p.name || t("Complete your profile")}</h2>
+            <p>{p.location || t("Location not set")}</p>
           </div>
           <span className="blood-badge">{p.bloodGroup || "—"}</span>
         </div>
         <dl className="profile-details">
           <div>
-            <dt>Contact number</dt>
-            <dd>{p.phone || "Not added"}</dd>
+            <dt>{t("Contact number")}</dt>
+            <dd>{p.phone || t("Not added")}</dd>
           </div>
           <div>
-            <dt>Availability</dt>
-            <dd>{p.available ? "Willing to donate" : "Unavailable"}</dd>
+            <dt>{t("Availability")}</dt>
+            <dd>{p.available ? t("Willing to donate") : t("Unavailable")}</dd>
           </div>
           <div>
-            <dt>Directory listing</dt>
-            <dd>{p.visible && p.consent ? "Public" : "Private"}</dd>
+            <dt>{t("Directory listing")}</dt>
+            <dd>{p.visible && p.consent ? t("Public") : t("Private")}</dd>
           </div>
           <div>
-            <dt>Contact-sharing consent</dt>
-            <dd>{p.consent ? "Given" : "Not given"}</dd>
+            <dt>{t("Contact-sharing consent")}</dt>
+            <dd>{p.consent ? t("Given") : t("Not given")}</dd>
           </div>
         </dl>
         <button
@@ -79,9 +83,9 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             setEditing(true);
           }}
         >
-          Change profile
+          {t("Change profile")}{" "}
         </button>
-        {message && <p role="status">{message}</p>}
+        {message && <p role="status">{t.error(message)}</p>}
       </section>
     );
   return (
@@ -105,7 +109,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
               visible: f.get("visible") === "on",
               consent: f.get("consent") === "on",
             });
-            setMessage("Profile saved.");
+            setMessage(t("Profile saved."));
             setEditing(false);
             router.refresh();
           } catch (e) {
@@ -115,7 +119,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           }
         }}
       >
-        <label htmlFor="name">Full name</label>
+        <label htmlFor="name">{t("Full name")}</label>
         <input
           id="name"
           name="name"
@@ -125,7 +129,7 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           defaultValue={p.name}
           autoComplete="name"
         />
-        <label htmlFor="contact-phone">Contact mobile number</label>
+        <label htmlFor="contact-phone">{t("Contact mobile number")}</label>
         <input
           id="contact-phone"
           name="phone"
@@ -136,35 +140,37 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           placeholder="01XXXXXXXXX"
         />
         <p className="muted">
-          Used for donor contact, never for login. Numbers are self-reported and
-          not verified by JibonDrop.
+          {t(
+            "Used for donor contact, never for login. Numbers are self-reported and not verified by JibonDrop.",
+          )}{" "}
         </p>
-        <label htmlFor="profile-blood">Blood group</label>
+        <label htmlFor="profile-blood">{t("Blood group")}</label>
         <select
           id="profile-blood"
           name="bloodGroup"
           defaultValue={p.bloodGroup}
           required
         >
-          <option value="">Choose blood group</option>
+          <option value="">{t("Choose blood group")}</option>
           {bloodGroups.map((x) => (
             <option key={x}>{x}</option>
           ))}
         </select>
         <Locations required initial={loc} onChange={setLoc} />
         <label htmlFor="fallbackArea">
-          Area not listed — private area description
+          {t("Area not listed — private area description")}{" "}
         </label>
         <input
           id="fallbackArea"
           name="fallbackArea"
           maxLength={120}
           defaultValue={p.fallbackArea || ""}
-          placeholder="Use only if your locality or area is missing"
+          placeholder={t("Use only if your locality or area is missing")}
         />
         <p className="muted">
-          This text stays private and is linked to your selected parent
-          location.
+          {t(
+            "This text stays private and is linked to your selected parent location.",
+          )}{" "}
         </p>
         <label className="check">
           <input
@@ -172,9 +178,9 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             type="checkbox"
             defaultChecked={p.available}
           />
-          I’m currently willing to donate
+          {t("I’m currently willing to donate")}{" "}
         </label>
-        <p className="muted">This is not medical clearance.</p>
+        <p className="muted">{t("This is not medical clearance.")}</p>
         <label className="check">
           <input
             id="profile-consent"
@@ -184,8 +190,9 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             required={visible}
             aria-describedby="listing-consent-help"
           />
-          I consent to a public donor profile and to sharing my mobile number
-          through the contact action.
+          {t(
+            "I consent to a public donor profile and to sharing my mobile number through the contact action.",
+          )}{" "}
         </label>
         <label className="check">
           <input
@@ -194,16 +201,18 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             checked={visible}
             onChange={(e) => setVisible(e.target.checked)}
           />
-          Show my listing in the donor directory
+          {t("Show my listing in the donor directory")}{" "}
         </label>
         <p className="muted" id="listing-consent-help">
-          To publish your listing, check the contact-sharing consent box above.
-          You can save a private profile by leaving the listing option off.{" "}
-          Anyone can search and contact listed donors. Withdraw consent or hide
-          your listing at any time.
+          {t(
+            "To publish your listing, check the contact-sharing consent box above. You can save a private profile by leaving the listing option off.",
+          )}{" "}
+          {t(
+            "Anyone can search and contact listed donors. Withdraw consent or hide your listing at any time.",
+          )}{" "}
         </p>
         <button className="button" disabled={busy}>
-          {busy ? "Saving…" : "Save profile"}
+          {busy ? t("Saving…") : t("Save profile")}
         </button>
         <button
           className="text-button"
@@ -211,9 +220,9 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
           disabled={busy}
           onClick={() => setEditing(false)}
         >
-          Cancel
+          {t("Cancel")}{" "}
         </button>
-        <p role="status">{message}</p>
+        <p role="status">{t.error(message)}</p>
       </form>
       <div className="dashboard-panel">
         <PhotoEditor hasPhoto={p.hasPhoto} />

@@ -1,3 +1,4 @@
+import { getTranslation } from "@/lib/i18n-server";
 import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -7,6 +8,8 @@ import { AccountActions } from "@/components/dashboard";
 import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
+  const t = await getTranslation();
+
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
   const passwordAccount = await db().account.findFirst({
@@ -20,9 +23,9 @@ export default async function SettingsPage() {
   return (
     <div className="editor-width">
       <div className="page-intro">
-        <span className="eyebrow">Account preferences</span>
-        <h1>Settings</h1>
-        <p>Manage how you sign in and keep your account secure.</p>
+        <span className="eyebrow">{t("Account preferences")}</span>
+        <h1>{t("Settings")}</h1>
+        <p>{t("Manage how you sign in and keep your account secure.")}</p>
       </div>
       <AccountSettings
         email={session.user.email}
@@ -30,8 +33,10 @@ export default async function SettingsPage() {
         emailEnabled={emailConfigured()}
       />
       <section className="dashboard-panel">
-        <h2>Account management</h2>
-        <p>Sign out of this device or permanently delete your account.</p>
+        <h2>{t("Account management")}</h2>
+        <p>
+          {t("Sign out of this device or permanently delete your account.")}
+        </p>
         <AccountActions />
       </section>
     </div>

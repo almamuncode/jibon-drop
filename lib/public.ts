@@ -1,3 +1,4 @@
+import { type Locale } from "./i18n";
 import { db } from "./db";
 export const publicSelect = {
   publicId: true,
@@ -22,12 +23,18 @@ export const published = {
   name: { not: "" },
   bloodGroup: { not: "" },
 };
-export async function locationLabel(ids: (string | null)[]) {
+export async function locationLabel(
+  ids: (string | null)[],
+  locale: Locale = "bn",
+) {
   const records = await db().location.findMany({
     where: { id: { in: ids.filter((id): id is string => !!id) } },
   });
   return ids
-    .map((id) => records.find((r) => r.id === id)?.name)
+    .map((id) => {
+      const record = records.find((r) => r.id === id);
+      return locale === "bn" ? record?.bnName || record?.name : record?.name;
+    })
     .filter(Boolean)
     .reverse()
     .join(", ");

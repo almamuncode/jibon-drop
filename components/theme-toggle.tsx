@@ -1,9 +1,12 @@
 "use client";
+import { useTranslation } from "@/components/language";
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 export function ThemeToggle() {
+  const t = useTranslation();
+
   const input = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const media = matchMedia("(prefers-color-scheme: dark)");
@@ -28,13 +31,13 @@ export function ThemeToggle() {
   }, []);
 
   return (
-    <label className="theme-toggle" title="Toggle dark mode">
+    <label className="theme-toggle" title={t("Toggle dark mode")}>
       <input
         ref={input}
         id="theme-switch"
         type="checkbox"
         role="switch"
-        aria-label="Dark mode"
+        aria-label={t("Dark mode")}
         onChange={(event) => {
           const theme = event.currentTarget.checked ? "dark" : "light";
           document.documentElement.dataset.theme = theme;
@@ -46,10 +49,10 @@ export function ThemeToggle() {
       <Sun className="theme-sun" size={18} aria-hidden="true" />
       <Moon className="theme-moon" size={18} aria-hidden="true" />
       <span className="theme-sun" aria-hidden="true">
-        Light
+        {t("Light")}{" "}
       </span>
       <span className="theme-moon" aria-hidden="true">
-        Dark
+        {t("Dark")}{" "}
       </span>
     </label>
   );

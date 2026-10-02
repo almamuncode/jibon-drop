@@ -1,4 +1,6 @@
 "use client";
+import { useLocale, useTranslation } from "@/components/language";
+
 import { useEffect, useState } from "react";
 type Item = { id: string; name: string; bnName: string | null; type: string };
 export type LocationValue = {
@@ -17,6 +19,9 @@ export function Locations({
   onChange?: (v: LocationValue) => void;
   required?: boolean;
 }) {
+  const t = useTranslation();
+  const locale = useLocale();
+
   const [value, setValue] = useState<LocationValue>({
     divisionId: "",
     districtId: "",
@@ -78,18 +83,19 @@ export function Locations({
             <label htmlFor={key}>
               {
                 [
-                  "Division",
-                  "District",
-                  "Upazila / Thana",
-                  "Union / Ward / Area",
+                  t("Division"),
+                  t("District"),
+                  t("Upazila / Thana"),
+                  t("Union / Ward / Area"),
                 ][i]
               }
             </label>
             <input
               aria-label={
-                "Search " + ["divisions", "districts", "localities", "areas"][i]
+                t("Search ") +
+                [t("divisions"), t("districts"), t("localities"), t("areas")][i]
               }
-              placeholder="Type to filter options"
+              placeholder={t("Type to filter options")}
               value={queries[i]}
               disabled={i > 0 && !value[keys[i - 1]]}
               onChange={(e) =>
@@ -108,9 +114,14 @@ export function Locations({
             >
               <option value="">
                 {required && i >= 2
-                  ? "Area not listed / choose below"
-                  : "All " +
-                    ["divisions", "districts", "localities", "areas"][i]}
+                  ? t("Area not listed / choose below")
+                  : t("All ") +
+                    [
+                      t("divisions"),
+                      t("districts"),
+                      t("localities"),
+                      t("areas"),
+                    ][i]}
               </option>
               {options[i]
                 .filter(
@@ -122,8 +133,7 @@ export function Locations({
                 )
                 .map((x) => (
                   <option key={x.id} value={x.id}>
-                    {x.name}
-                    {x.bnName ? " · " + x.bnName : ""}
+                    {locale === "bn" ? x.bnName || x.name : x.name}
                   </option>
                 ))}
             </select>
@@ -132,18 +142,19 @@ export function Locations({
       </div>
       {loading && (
         <p className="muted" role="status">
-          Loading locations…
+          {t("Loading locations…")}{" "}
         </p>
       )}
       {error && (
         <p className="error" role="alert">
-          {error}
+          {t.error(error)}
         </p>
       )}
       {required && (
         <p className="muted">
-          Urban areas may be missing. Choose the known parent and use the
-          private area field below; don’t select an unrelated union.
+          {t(
+            "Urban areas may be missing. Choose the known parent and use the private area field below; don’t select an unrelated union.",
+          )}{" "}
         </p>
       )}
     </>

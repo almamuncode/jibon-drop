@@ -1,4 +1,6 @@
 "use client";
+import { useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 export function AdminActions({
@@ -10,6 +12,8 @@ export function AdminActions({
   actions: { value: string; label: string }[];
   donationId?: string;
 }) {
+  const t = useTranslation();
+
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -36,7 +40,7 @@ export function AdminActions({
           const result = await response.json();
           if (!response.ok) throw new Error(result.error);
           form.reset();
-          setMessage("Change saved.");
+          setMessage(t("Change saved."));
           router.refresh();
         } catch (error) {
           setMessage((error as Error).message);
@@ -46,7 +50,7 @@ export function AdminActions({
       }}
     >
       <label>
-        Action
+        {t("Action")}{" "}
         <select name="action" required>
           {actions.map((a) => (
             <option key={a.value} value={a.value}>
@@ -56,19 +60,19 @@ export function AdminActions({
         </select>
       </label>
       <label>
-        Reason
+        {t("Reason")}{" "}
         <input
           name="reason"
           required
           minLength={3}
           maxLength={500}
-          placeholder="Explain this change for the activity log"
+          placeholder={t("Explain this change for the activity log")}
         />
       </label>
       <button className="button secondary" disabled={busy}>
-        {busy ? "Saving…" : "Apply change"}
+        {busy ? t("Saving…") : t("Apply change")}
       </button>
-      <p role="status">{message}</p>
+      <p role="status">{t.error(message)}</p>
     </form>
   );
 }

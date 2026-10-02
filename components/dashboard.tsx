@@ -1,4 +1,6 @@
 "use client";
+import { useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 export async function api(path: string, body: unknown, method = "POST") {
@@ -16,6 +18,8 @@ export function AccountActions({
 }: {
   showLogout?: boolean;
 }) {
+  const t = useTranslation();
+
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [confirm, setConfirm] = useState("");
@@ -50,7 +54,7 @@ export function AccountActions({
           disabled={busy}
           onClick={() => run("logout")}
         >
-          Log out
+          {t("Log out")}{" "}
         </button>
       )}
       <button
@@ -64,17 +68,17 @@ export function AccountActions({
           setError("");
         }}
       >
-        {deleting ? "Cancel deletion" : "Delete my profile"}
+        {deleting ? t("Cancel deletion") : t("Delete my profile")}
       </button>
       {deleting && (
         <div className="notice delete-profile-confirmation">
           <p>
-            This permanently deletes your sign-in account, donor profile,
-            donation history and photo, and logs out all devices. This cannot be
-            undone. Type DELETE to confirm.
+            {t(
+              "This permanently deletes your sign-in account, donor profile, donation history and photo, and logs out all devices. This cannot be undone. Type DELETE to confirm.",
+            )}{" "}
           </p>
           <input
-            aria-label="Deletion confirmation"
+            aria-label={t("Deletion confirmation")}
             autoComplete="off"
             disabled={busy}
             value={confirm}
@@ -85,12 +89,12 @@ export function AccountActions({
             disabled={confirm !== "DELETE" || busy}
             onClick={() => run("account")}
           >
-            {busy ? "Deleting…" : "Permanently delete my profile"}
+            {busy ? t("Deleting…") : t("Permanently delete my profile")}
           </button>
         </div>
       )}
       <p className="error" role="alert">
-        {error}
+        {t.error(error)}
       </p>
     </div>
   );
@@ -103,6 +107,8 @@ export function StatusControls({
   available: boolean;
   visible: boolean;
 }) {
+  const t = useTranslation();
+
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -111,7 +117,7 @@ export function StatusControls({
     try {
       await api("status", next, "PATCH");
       router.refresh();
-      setMessage("Status updated.");
+      setMessage(t("Status updated."));
     } catch (e) {
       setMessage((e as Error).message);
     } finally {
@@ -127,7 +133,7 @@ export function StatusControls({
           disabled={busy}
           onChange={(e) => update({ available: e.target.checked, visible })}
         />
-        Available to help
+        {t("Available to help")}{" "}
       </label>
       <label className="check">
         <input
@@ -136,10 +142,10 @@ export function StatusControls({
           disabled={busy}
           onChange={(e) => update({ available, visible: e.target.checked })}
         />
-        Show my directory listing
+        {t("Show my directory listing")}{" "}
       </label>
       <p role="status" className="muted">
-        {message}
+        {t.error(message)}
       </p>
     </div>
   );

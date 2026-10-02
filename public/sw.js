@@ -1,5 +1,5 @@
 /* global self */
-const CACHE = "jibondrop-offline-v1";
+const CACHE = "jibondrop-offline-v2";
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) => cache.add("/offline.html")),

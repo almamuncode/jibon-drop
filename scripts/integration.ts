@@ -264,7 +264,7 @@ async function main() {
         password,
       })
     ).response.status,
-    400,
+    429,
   );
   console.log(
     "PASS: email registration/login; case-insensitive username login; password hashing; duplicate accounts; persistent throttling; private identity; donor ownership; contact consent; donation aggregates; logout; account deletion revokes every session.",
@@ -276,6 +276,9 @@ async function main() {
     headless: true,
   });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page
+    .context()
+    .addCookies([{ name: "jibondrop-language", value: "en", url: base }]);
   await page.goto(base + "/register");
   await page.getByLabel("Full name", { exact: true }).fill("Browser Fixture");
   await page.getByLabel("Email", { exact: true }).fill("browser@example.com");
@@ -335,6 +338,11 @@ async function main() {
     path: "/tmp/jibondrop-settings-mobile.png",
     fullPage: true,
   });
+  await page.goto(base + "/login");
+  await page.waitForURL("**/dashboard");
+  await page.locator('summary[aria-label="Open account options"]').click();
+  await page.getByRole("button", { name: "Log out", exact: true }).click();
+  await page.waitForURL(base + "/");
   await page.goto(base + "/login");
   await page.getByLabel("Email or username").fill("browser_fixture");
   await page

@@ -1,16 +1,21 @@
+import { dateLabel } from "@/lib/format";
+import { getLocale, getTranslation } from "@/lib/i18n-server";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { SearchForm } from "@/components/search";
-import { Avatar, dateLabel, Notice } from "@/components/ui";
+import { Avatar, Notice } from "@/components/ui";
 import { Contact } from "@/components/contact";
 import { db } from "@/lib/db";
 import { published, publicSelect, validateHierarchy } from "@/lib/public";
 import { bloodGroups } from "@/lib/validation";
 export const dynamic = "force-dynamic";
 async function loadSearch(f: Record<string, string>) {
+  const t = await getTranslation();
+  const locale = await getLocale();
+
   try {
     if (!bloodGroups.includes(f.bloodGroup as (typeof bloodGroups)[number]))
-      throw new Error("Choose a supported blood group.");
+      throw new Error(t("Choose a supported blood group."));
     if (f.divisionId)
       await validateHierarchy({
         divisionId: f.divisionId,
@@ -19,7 +24,7 @@ async function loadSearch(f: Record<string, string>) {
         areaId: f.areaId || null,
       });
     else if (f.districtId || f.localityId || f.areaId)
-      throw new Error("Choose parent locations first.");
+      throw new Error(t("Choose parent locations first."));
     const where: Prisma.DonorWhereInput = {
       ...published,
       bloodGroup: f.bloodGroup,
@@ -61,7 +66,7 @@ async function loadSearch(f: Record<string, string>) {
     ];
     const locations = await db().location.findMany({
       where: { id: { in: ids } },
-      select: { id: true, name: true },
+      select: { id: true, name: true, bnName: true },
     });
     return { total, donors, locations, page, error: null };
   } catch (e) {
@@ -79,6 +84,9 @@ export default async function Finder({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const t = await getTranslation();
+  const locale = await getLocale();
+
   const raw = await searchParams;
   const f = Object.fromEntries(
     Object.entries(raw).filter(
@@ -93,26 +101,31 @@ export default async function Finder({
   }
   const result = !f.bloodGroup ? (
     <Notice>
-      Choose a blood group to start your search. You can search all locations.
+      {t(
+        "Choose a blood group to start your search. You can search all locations.",
+      )}{" "}
     </Notice>
   ) : error ? (
-    <Notice>{error}</Notice>
+    <Notice>{t.error(error)}</Notice>
   ) : (
     <>
       <div className="results-heading">
         <h2>
-          {total} matching donor{total === 1 ? "" : "s"}
+          {locale === "bn"
+            ? `${total.toLocaleString("bn-BD")} জন রক্তদাতা`
+            : `${total} matching donor${total === 1 ? "" : "s"}`}
         </h2>
         <span className="muted">
-          {f.bloodGroup} · self-reported information
+          {f.bloodGroup} {t("· self-reported information")}{" "}
         </span>
       </div>
       {!donors.length ? (
         <div className="empty">
-          <h3>No donors match these filters.</h3>
+          <h3>{t("No donors match these filters.")}</h3>
           <p>
-            Try removing a location filter, or include temporarily unavailable
-            donors.
+            {t(
+              "Try removing a location filter, or include temporarily unavailable donors.",
+            )}{" "}
           </p>
           {["areaId", "localityId", "districtId", "divisionId", "available"]
             .filter((k) => f[k])
@@ -134,19 +147,17 @@ export default async function Finder({
                   key={key}
                   href={"/find-donors?" + new URLSearchParams(next)}
                 >
-                  Remove{" "}
-                  {
+                  {t(
                     (
                       {
-                        areaId: "area",
-                        localityId: "upazila / thana",
-                        districtId: "district",
-                        divisionId: "division",
-                        available: "availability",
+                        areaId: "Remove area filter",
+                        localityId: "Remove upazila / thana filter",
+                        districtId: "Remove district filter",
+                        divisionId: "Remove division filter",
+                        available: "Remove availability filter",
                       } as Record<string, string>
-                    )[key]
-                  }{" "}
-                  filter
+                    )[key],
+                  )}
                 </Link>
               );
             })}
@@ -162,41 +173,48 @@ export default async function Finder({
               <h3>{d.name}</h3>
               <p className="muted">
                 {[d.localityId, d.districtId, d.divisionId]
-                  .map((id) => locations.find((l) => l.id === id)?.name)
+                  .map((id) => {
+                    const location = locations.find((l) => l.id === id);
+                    return locale === "bn"
+                      ? location?.bnName || location?.name
+                      : location?.name;
+                  })
                   .filter(Boolean)
                   .join(", ")}
               </p>
               <span className={"status " + (!d.available ? "unavailable" : "")}>
-                {d.available ? "Available" : "Temporarily unavailable"}
+                {d.available ? t("Available") : t("Temporarily unavailable")}
               </span>
               <dl>
                 <div>
-                  <dt>Donations recorded</dt>
+                  <dt>{t("Donations recorded")}</dt>
                   <dd>{d.donationCount}</dd>
                 </div>
                 <div>
-                  <dt>Last donation</dt>
-                  <dd>{dateLabel(d.lastDonation)}</dd>
+                  <dt>{t("Last donation")}</dt>
+                  <dd>{dateLabel(d.lastDonation, locale)}</dd>
                 </div>
               </dl>
               <Link className="text-link" href={"/donors/" + d.publicId}>
-                View profile →
+                {t("View profile →")}{" "}
               </Link>
               <Contact publicId={d.publicId} />
             </article>
           ))}
         </div>
       )}
-      <nav className="pagination" aria-label="Search pages">
+      <nav className="pagination" aria-label={t("Search pages")}>
         {page > 1 && (
           <Link className="button secondary" href={pageHref(page - 1)}>
-            Previous
+            {t("Previous")}{" "}
           </Link>
         )}
-        <span>Page {page}</span>
+        <span>
+          {t("Page")} {page}
+        </span>
         {page * 12 < total && (
           <Link className="button secondary" href={pageHref(page + 1)}>
-            Next
+            {t("Next")}{" "}
           </Link>
         )}
       </nav>
@@ -205,20 +223,20 @@ export default async function Finder({
   return (
     <div className="container">
       <div className="page-intro">
-        <span className="eyebrow">Here when you need a connection</span>
-        <h1>Find blood donors</h1>
-        <p>Search freely. Reach out respectfully.</p>
+        <span className="eyebrow">{t("Here when you need a connection")}</span>
+        <h1>{t("Find blood donors")}</h1>
+        <p>{t("Search freely. Reach out respectfully.")}</p>
       </div>
       <div className="finder-layout">
         <aside>
           <SearchForm filters={f} />
         </aside>
-        <section aria-label="Search results">
+        <section aria-label={t("Search results")}>
           {result}
           <p className="muted">
-            Availability is donor-reported willingness, not medical clearance.
-            Donation records are self-reported; missing records do not mean
-            someone has never donated.
+            {t(
+              "Availability is donor-reported willingness, not medical clearance. Donation records are self-reported; missing records do not mean someone has never donated.",
+            )}{" "}
           </p>
         </section>
       </div>

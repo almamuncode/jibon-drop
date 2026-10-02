@@ -1,4 +1,6 @@
 "use client";
+import { useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 export function AuthForm({
@@ -8,6 +10,8 @@ export function AuthForm({
   register?: boolean;
   googleEnabled?: boolean;
 }) {
+  const t = useTranslation();
+
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   async function google() {
@@ -20,7 +24,7 @@ export function AuthForm({
         errorCallbackURL: "/login?error=google",
       });
       if (result.error)
-        throw new Error(result.error.message || "Google sign-in failed.");
+        throw new Error(result.error.message || t("Google sign-in failed."));
     } catch (e) {
       setError((e as Error).message);
       setBusy(false);
@@ -59,16 +63,18 @@ export function AuthForm({
             d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.92 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
           />
         </svg>
-        Continue with Google
+        {t("Continue with Google")}{" "}
       </button>
       {!googleEnabled && (
         <p className="muted">
-          Google sign-in will be available once it is configured. You can use
-          email and password below.
+          {t(
+            "Google sign-in will be available once it is configured. You can use email and password below.",
+          )}{" "}
         </p>
       )}
       <p className="auth-divider">
-        or {register ? "create an account" : "sign in with your password"}
+        {t("or")}{" "}
+        {register ? t("create an account") : t("sign in with your password")}
       </p>
       <form
         onSubmit={async (e) => {
@@ -80,7 +86,7 @@ export function AuthForm({
             let result;
             if (register) {
               if (f.get("password") !== f.get("confirmPassword"))
-                throw new Error("Passwords do not match.");
+                throw new Error(t("Passwords do not match."));
               result = await authClient.signUp.email({
                 name: String(f.get("name")).trim(),
                 email: String(f.get("email")).trim().toLowerCase(),
@@ -104,8 +110,8 @@ export function AuthForm({
             if (result.error)
               throw new Error(
                 register
-                  ? result.error.message || "Unable to create account."
-                  : "Invalid email, username or password.",
+                  ? result.error.message || t("Unable to create account.")
+                  : t("Invalid email, username or password."),
               );
             // Reload with the new session cookie and clear guest page caches.
             window.location.replace(
@@ -120,7 +126,7 @@ export function AuthForm({
       >
         {register ? (
           <>
-            <label htmlFor="auth-name">Full name</label>
+            <label htmlFor="auth-name">{t("Full name")}</label>
             <input
               id="auth-name"
               name="name"
@@ -129,7 +135,7 @@ export function AuthForm({
               maxLength={80}
               autoComplete="name"
             />
-            <label htmlFor="auth-email">Email</label>
+            <label htmlFor="auth-email">{t("Email")}</label>
             <input
               id="auth-email"
               name="email"
@@ -138,7 +144,7 @@ export function AuthForm({
               maxLength={254}
               autoComplete="email"
             />
-            <label htmlFor="auth-username">Username</label>
+            <label htmlFor="auth-username">{t("Username")}</label>
             <input
               id="auth-username"
               name="username"
@@ -150,13 +156,14 @@ export function AuthForm({
               aria-describedby="username-help"
             />
             <p id="username-help" className="muted">
-              3–30 letters, numbers or underscores. Usernames are
-              case-insensitive.
+              {t(
+                "3–30 letters, numbers or underscores. Usernames are case-insensitive.",
+              )}{" "}
             </p>
           </>
         ) : (
           <>
-            <label htmlFor="identifier">Email or username</label>
+            <label htmlFor="identifier">{t("Email or username")}</label>
             <input
               id="identifier"
               name="identifier"
@@ -165,7 +172,7 @@ export function AuthForm({
             />
           </>
         )}
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">{t("Password")}</label>
         <input
           id="password"
           name="password"
@@ -178,10 +185,11 @@ export function AuthForm({
         {register && (
           <>
             <p className="muted">
-              Use at least 10 characters. Your password is stored as a secure
-              hash.
+              {t(
+                "Use at least 10 characters. Your password is stored as a secure hash.",
+              )}{" "}
             </p>
-            <label htmlFor="confirmPassword">Confirm password</label>
+            <label htmlFor="confirmPassword">{t("Confirm password")}</label>
             <input
               id="confirmPassword"
               name="confirmPassword"
@@ -192,10 +200,14 @@ export function AuthForm({
           </>
         )}
         <button className="button full" disabled={busy}>
-          {busy ? "Please wait…" : register ? "Create account" : "Log in"}
+          {busy
+            ? t("Please wait…")
+            : register
+              ? t("Create account")
+              : t("Log in")}
         </button>
         <p role="alert" className="error">
-          {error}
+          {t.error(error)}
         </p>
       </form>
     </>

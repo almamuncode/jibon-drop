@@ -1,24 +1,27 @@
 "use client";
+import { useTranslation } from "@/components/language";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Heart, UserRound, ClipboardList } from "lucide-react";
 
 export function MobileNav({ signedIn }: { signedIn: boolean }) {
+  const t = useTranslation();
+
   const pathname = usePathname();
   return (
-    <nav className="mobile-nav" aria-label="Mobile navigation">
+    <nav className="mobile-nav" aria-label={t("Mobile navigation")}>
       {[
-        { href: "/", label: "Home", icon: Home },
-        { href: "/find-donors", label: "Find donors", icon: Search },
+        { href: "/", label: t("Home"), icon: Home },
+        { href: "/find-donors", label: t("Find donors"), icon: Search },
         signedIn
           ? {
               href: "/dashboard/donations",
-              label: "Donations",
+              label: t("Donations"),
               icon: ClipboardList,
             }
-          : { href: "/register", label: "Join", icon: Heart },
-        { href: "/dashboard", label: "My account", icon: UserRound },
+          : { href: "/register", label: t("Join"), icon: Heart },
+        { href: "/dashboard", label: t("My account"), icon: UserRound },
       ].map(({ href, label, icon: Icon }) => {
         const active =
           href === "/"

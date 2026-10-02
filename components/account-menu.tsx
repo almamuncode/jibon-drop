@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "@/components/language";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +25,8 @@ export function AccountMenu({
   image: string | null;
   isAdmin?: boolean;
 }) {
+  const t = useTranslation();
+
   const menu = useRef<HTMLDetailsElement>(null);
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -54,7 +57,7 @@ export function AccountMenu({
         if (e.key === "Escape") close();
       }}
     >
-      <summary aria-label="Open account options">
+      <summary aria-label={t("Open account options")}>
         <Avatar name={name} url={image} />
         <ChevronDown size={15} aria-hidden="true" />
       </summary>
@@ -65,11 +68,15 @@ export function AccountMenu({
         </div>
         {[
           ...(isAdmin
-            ? [{ href: "/admin", label: "Administration", icon: Settings }]
+            ? [{ href: "/admin", label: t("Administration"), icon: Settings }]
             : []),
-          { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-          { href: "/dashboard/profile", label: "My profile", icon: UserRound },
-          { href: "/dashboard/settings", label: "Settings", icon: Settings },
+          { href: "/dashboard", label: t("Dashboard"), icon: LayoutDashboard },
+          {
+            href: "/dashboard/profile",
+            label: t("My profile"),
+            icon: UserRound,
+          },
+          { href: "/dashboard/settings", label: t("Settings"), icon: Settings },
         ].map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href} onClick={close}>
             <Icon size={18} />
@@ -85,7 +92,9 @@ export function AccountMenu({
             try {
               const result = await authClient.signOut();
               if (result.error)
-                throw new Error(result.error.message || "Unable to log out.");
+                throw new Error(
+                  result.error.message || t("Unable to log out."),
+                );
               close();
               router.push("/");
               router.refresh();
@@ -97,11 +106,11 @@ export function AccountMenu({
           }}
         >
           <LogOut size={18} />
-          {busy ? "Logging out…" : "Log out"}
+          {busy ? t("Logging out…") : t("Log out")}
         </button>
         {error && (
           <p className="error" role="alert">
-            {error}
+            {t.error(error)}
           </p>
         )}
       </div>

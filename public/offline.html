@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="bn">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>You’re offline · JibonDrop</title>
+    <title>ইন্টারনেট সংযোগ নেই · জীবনড্রপ</title>
     <style>
       body {
         margin: 0;
@@ -54,13 +54,28 @@
   </head>
   <body>
     <main>
-      <strong>JibonDrop</strong>
-      <h1>You’re offline</h1>
+      <strong>জীবনড্রপ</strong>
+      <h1>ইন্টারনেট সংযোগ নেই</h1>
       <p>
-        Reconnect to search donors and manage your account. Donor availability
-        and contact information need a live connection.
+        রক্তদাতা খুঁজতে ও অ্যাকাউন্ট পরিচালনা করতে আবার ইন্টারনেটের সঙ্গে যুক্ত
+        হন। রক্তদাতার আগ্রহ ও যোগাযোগের তথ্য দেখতে ইন্টারনেট সংযোগ প্রয়োজন।
       </p>
-      <a href="/">Try again</a>
+      <a href="/">আবার চেষ্টা করুন</a>
     </main>
+    <script>
+      if (
+        document.cookie
+          .split(";")
+          .some((part) => part.trim() === "jibondrop-language=en")
+      ) {
+        document.documentElement.lang = "en";
+        document.title = "You’re offline · JibonDrop";
+        document.querySelector("strong").textContent = "JibonDrop";
+        document.querySelector("h1").textContent = "You’re offline";
+        document.querySelector("p").textContent =
+          "Reconnect to search donors and manage your account. Donor availability and contact information need a live connection.";
+        document.querySelector("a").textContent = "Try again";
+      }
+    </script>
   </body>
 </html>

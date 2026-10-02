@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "@/components/language";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Download } from "lucide-react";
@@ -14,6 +15,8 @@ function subscribeStandalone(callback: () => void) {
 }
 
 export function PwaInstall() {
+  const t = useTranslation();
+
   const [install, setInstall] = useState<InstallEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const standalone = useSyncExternalStore(
@@ -57,15 +60,16 @@ export function PwaInstall() {
             setInstall(null);
           }}
         >
-          <Download size={16} aria-hidden="true" /> Install JibonDrop
+          <Download size={16} aria-hidden="true" />{" "}
+          {t("Install JibonDrop")}{" "}
         </button>
       ) : (
         <details>
-          <summary>Add JibonDrop to your home screen</summary>
+          <summary>{t("Add JibonDrop to your home screen")}</summary>
           <p>
-            On iPhone or iPad, open this site in Safari, tap Share, then Add to
-            Home Screen. On Android, open the browser menu and choose Install
-            app or Add to Home screen.
+            {t(
+              "On iPhone or iPad, open this site in Safari, tap Share, then Add to Home Screen. On Android, open the browser menu and choose Install app or Add to Home screen.",
+            )}{" "}
           </p>
         </details>
       )}

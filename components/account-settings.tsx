@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "@/components/language";
 
 import { useState } from "react";
 import { Mail, LockKeyhole } from "lucide-react";
@@ -13,6 +14,8 @@ export function AccountSettings({
   hasPassword: boolean;
   emailEnabled: boolean;
 }) {
+  const t = useTranslation();
+
   const [emailMessage, setEmailMessage] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [emailBusy, setEmailBusy] = useState(false);
@@ -34,10 +37,12 @@ export function AccountSettings({
             });
             if (result.error)
               throw new Error(
-                result.error.message || "Unable to request an email change.",
+                result.error.message || t("Unable to request an email change."),
               );
             setEmailMessage(
-              "Check your email for the confirmation link. Your sign-in email stays the same until verification is complete.",
+              t(
+                "Check your email for the confirmation link. Your sign-in email stays the same until verification is complete.",
+              ),
             );
             form.reset();
           } catch (e) {
@@ -52,13 +57,13 @@ export function AccountSettings({
             <Mail size={21} />
           </span>
           <div>
-            <h2>Email address</h2>
+            <h2>{t("Email address")}</h2>
             <p>
-              Currently signed in as <strong>{email}</strong>
+              {t("Currently signed in as")} <strong>{email}</strong>
             </p>
           </div>
         </div>
-        <label htmlFor="settings-email">New email address</label>
+        <label htmlFor="settings-email">{t("New email address")}</label>
         <input
           id="settings-email"
           type="email"
@@ -70,19 +75,21 @@ export function AccountSettings({
           placeholder="you@example.com"
         />
         <p className="muted">
-          We verify the new address before changing your sign-in email. Verified
-          accounts also require approval from the current address.
+          {t(
+            "We verify the new address before changing your sign-in email. Verified accounts also require approval from the current address.",
+          )}{" "}
         </p>
         {!emailEnabled && (
           <p className="notice">
-            Email changes will be available once the site’s email delivery is
-            configured.
+            {t(
+              "Email changes will be available once the site’s email delivery is configured.",
+            )}{" "}
           </p>
         )}
         <button className="button" disabled={!emailEnabled || emailBusy}>
-          {emailBusy ? "Sending…" : "Change email"}
+          {emailBusy ? t("Sending…") : t("Change email")}
         </button>
-        <p role="status">{emailMessage}</p>
+        <p role="status">{t.error(emailMessage)}</p>
       </form>
       <form
         className="dashboard-panel settings-form"
@@ -92,7 +99,7 @@ export function AccountSettings({
           const values = new FormData(form);
           const newPassword = String(values.get("newPassword"));
           if (newPassword !== values.get("confirmation")) {
-            setPasswordMessage("The new passwords do not match.");
+            setPasswordMessage(t("The new passwords do not match."));
             return;
           }
           setPasswordBusy(true);
@@ -105,11 +112,13 @@ export function AccountSettings({
             });
             if (result.error)
               throw new Error(
-                result.error.message || "Unable to change your password.",
+                result.error.message || t("Unable to change your password."),
               );
             form.reset();
             setPasswordMessage(
-              "Password updated. Other signed-in sessions have been logged out.",
+              t(
+                "Password updated. Other signed-in sessions have been logged out.",
+              ),
             );
           } catch (e) {
             setPasswordMessage((e as Error).message);
@@ -123,13 +132,13 @@ export function AccountSettings({
             <LockKeyhole size={21} />
           </span>
           <div>
-            <h2>Password</h2>
-            <p>Choose a strong password you don’t use elsewhere.</p>
+            <h2>{t("Password")}</h2>
+            <p>{t("Choose a strong password you don’t use elsewhere.")}</p>
           </div>
         </div>
         {hasPassword ? (
           <>
-            <label htmlFor="current-password">Current password</label>
+            <label htmlFor="current-password">{t("Current password")}</label>
             <input
               id="current-password"
               name="currentPassword"
@@ -138,7 +147,7 @@ export function AccountSettings({
               required
               disabled={passwordBusy}
             />
-            <label htmlFor="new-password">New password</label>
+            <label htmlFor="new-password">{t("New password")}</label>
             <input
               id="new-password"
               name="newPassword"
@@ -151,9 +160,11 @@ export function AccountSettings({
               aria-describedby="password-guidance"
             />
             <p id="password-guidance" className="muted">
-              Use at least 10 characters.
+              {t("Use at least 10 characters.")}{" "}
             </p>
-            <label htmlFor="confirm-password">Confirm new password</label>
+            <label htmlFor="confirm-password">
+              {t("Confirm new password")}
+            </label>
             <input
               id="confirm-password"
               name="confirmation"
@@ -165,16 +176,17 @@ export function AccountSettings({
               disabled={passwordBusy}
             />
             <button className="button" disabled={passwordBusy}>
-              {passwordBusy ? "Updating…" : "Update password"}
+              {passwordBusy ? t("Updating…") : t("Update password")}
             </button>
           </>
         ) : (
           <div className="notice">
-            You sign in through Google and don’t have a JibonDrop password.
-            Manage your Google password in your Google account.
+            {t(
+              "You sign in through Google and don’t have a JibonDrop password. Manage your Google password in your Google account.",
+            )}{" "}
           </div>
         )}
-        <p role="status">{passwordMessage}</p>
+        <p role="status">{t.error(passwordMessage)}</p>
       </form>
     </>
   );

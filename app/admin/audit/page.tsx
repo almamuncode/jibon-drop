@@ -1,7 +1,10 @@
+import { getTranslation } from "@/lib/i18n-server";
 import { db } from "@/lib/db";
 import { currentAdmin } from "@/lib/admin";
 import { notFound } from "next/navigation";
 export default async function AuditPage() {
+  const t = await getTranslation();
+
   if (!(await currentAdmin())) notFound();
   const events = await db().adminAudit.findMany({
     orderBy: { createdAt: "desc" },
@@ -17,13 +20,13 @@ export default async function AuditPage() {
   return (
     <>
       <div className="page-heading">
-        <span className="eyebrow">Administration</span>
-        <h1>Activity log</h1>
-        <p>The latest 100 administrative changes.</p>
+        <span className="eyebrow">{t("Administration")}</span>
+        <h1>{t("Activity log")}</h1>
+        <p>{t("The latest 100 administrative changes.")}</p>
       </div>
       {events.map((e) => (
         <article className="dashboard-panel" key={e.id}>
-          <strong>{e.action}</strong>
+          <strong>{t(e.action)}</strong>
           <p>
             {label(e.actorId)} → {label(e.targetId)}
           </p>
@@ -31,7 +34,7 @@ export default async function AuditPage() {
           <small>{e.createdAt.toISOString()}</small>
         </article>
       ))}
-      {!events.length && <p>No administrative changes yet.</p>}
+      {!events.length && <p>{t("No administrative changes yet.")}</p>}
     </>
   );
 }

@@ -165,6 +165,9 @@ async function main() {
       };
     }),
   );
+  await context.addCookies([
+    { name: "jibondrop-language", value: "en", url: base },
+  ]);
   const page = await context.newPage();
   await page.goto(base + "/admin");
   await page.getByRole("heading", { name: "Manage users" }).waitFor();
@@ -178,6 +181,17 @@ async function main() {
     path: "/tmp/jibon-admin-mobile.png",
     fullPage: true,
   });
+  await page.getByRole("button", { name: "BN", exact: true }).click();
+  await page.waitForFunction(() => document.documentElement.lang === "bn");
+  await page
+    .getByRole("heading", { name: "ব্যবহারকারী পরিচালনা", exact: true })
+    .waitFor();
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    true,
+  );
   await browser.close();
   await pg.query('TRUNCATE "User", "Donor", "AdminAudit", "RateLimit" CASCADE');
   await pg.end();

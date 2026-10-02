@@ -1,3 +1,5 @@
+import { dateLabel } from "@/lib/format";
+import { getLocale, getTranslation } from "@/lib/i18n-server";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { currentAdmin } from "@/lib/admin";
@@ -9,6 +11,9 @@ export default async function UserPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getTranslation();
+  const locale = await getLocale();
+
   if (!(await currentAdmin())) notFound();
   const { id } = await params;
   const user = await db().user.findUnique({
@@ -30,21 +35,19 @@ export default async function UserPage({
   if (!user) notFound();
   const donor = user.donor;
   const location = donor
-    ? await locationLabel([
-        donor.divisionId,
-        donor.districtId,
-        donor.localityId,
-        donor.areaId,
-      ])
+    ? await locationLabel(
+        [donor.divisionId, donor.districtId, donor.localityId, donor.areaId],
+        locale,
+      )
     : "";
   return (
     <>
       <div className="page-heading">
-        <span className="eyebrow">User details</span>
+        <span className="eyebrow">{t("User details")}</span>
         <h1>{user.name}</h1>
         <p>
-          {user.suspended ? "Suspended" : "Active"} ·{" "}
-          {user.role === "ADMIN" ? "Administrator" : "Member"}
+          {user.suspended ? t("Suspended") : t("Active")} ·{" "}
+          {user.role === "ADMIN" ? t("Administrator") : t("Member")}
         </p>
       </div>
       <section className="dashboard-panel">
@@ -57,58 +60,60 @@ export default async function UserPage({
           <span className="blood-badge">{donor?.bloodGroup || "—"}</span>
         </div>
         <dl className="profile-details">
-          <dt>Username</dt>
+          <dt>{t("Username")}</dt>
           <dd>{user.username || "—"}</dd>
-          <dt>Email verified</dt>
-          <dd>{user.emailVerified ? "Yes" : "No"}</dd>
-          <dt>Contact number</dt>
-          <dd>{donor?.phone || "Not set"}</dd>
-          <dt>Location</dt>
-          <dd>{location || "Not set"}</dd>
-          <dt>Listing</dt>
+          <dt>{t("Email verified")}</dt>
+          <dd>{user.emailVerified ? t("Yes") : t("No")}</dd>
+          <dt>{t("Contact number")}</dt>
+          <dd>{donor?.phone || t("Not set")}</dd>
+          <dt>{t("Location")}</dt>
+          <dd>{location || t("Not set")}</dd>
+          <dt>{t("Listing")}</dt>
           <dd>
             {donor?.moderationBlocked
-              ? "Blocked by admin"
+              ? t("Blocked by admin")
               : donor?.visible
-                ? "Visible when profile is complete"
-                : "Private"}
+                ? t("Visible when profile is complete")
+                : t("Private")}
           </dd>
-          <dt>Consent</dt>
-          <dd>{donor?.consentAt ? "Given" : "Not given"}</dd>
-          <dt>Availability</dt>
-          <dd>{donor?.available ? "Available" : "Unavailable"}</dd>
-          <dt>Donations</dt>
+          <dt>{t("Consent")}</dt>
+          <dd>{donor?.consentAt ? t("Given") : t("Not given")}</dd>
+          <dt>{t("Availability")}</dt>
+          <dd>{donor?.available ? t("Available") : t("Unavailable")}</dd>
+          <dt>{t("Donations")}</dt>
           <dd>{donor?.donationCount || 0}</dd>
         </dl>
       </section>
       <section className="dashboard-panel">
-        <h2>Manage account</h2>
+        <h2>{t("Manage account")}</h2>
         <p>
-          Suspending an account signs out all sessions and removes its public
-          listing. Restoring a listing preserves the donor’s own visibility and
-          consent choices.
+          {t(
+            "Suspending an account signs out all sessions and removes its public listing. Restoring a listing preserves the donor’s own visibility and consent choices.",
+          )}{" "}
         </p>
         <AdminActions
           userId={id}
           actions={[
             {
               value: user.suspended ? "unsuspend" : "suspend",
-              label: user.suspended ? "Reactivate account" : "Suspend account",
+              label: user.suspended
+                ? t("Reactivate account")
+                : t("Suspend account"),
             },
             {
               value: user.role === "ADMIN" ? "demote" : "promote",
               label:
                 user.role === "ADMIN"
-                  ? "Remove admin role"
-                  : "Grant admin role",
+                  ? t("Remove admin role")
+                  : t("Grant admin role"),
             },
             ...(donor
               ? [
                   {
                     value: donor.moderationBlocked ? "restore" : "hide",
                     label: donor.moderationBlocked
-                      ? "Allow listing"
-                      : "Block listing",
+                      ? t("Allow listing")
+                      : t("Block listing"),
                   },
                 ]
               : []),
@@ -116,26 +121,27 @@ export default async function UserPage({
         />
       </section>
       <section className="dashboard-panel">
-        <h2>Donation records</h2>
+        <h2>{t("Donation records")}</h2>
         <p>
-          Showing up to 100 recent records. Corrections are recorded in the
-          activity log.
+          {t(
+            "Showing up to 100 recent records. Corrections are recorded in the activity log.",
+          )}{" "}
         </p>
         {donor?.donations.map((d) => (
           <article className="admin-record" key={d.id}>
-            <h3>{d.hospital || "Donation"}</h3>
-            <p>{d.date.toISOString().slice(0, 10)}</p>
-            <p>{d.note || "No notes"}</p>
+            <h3>{d.hospital || t("Donation")}</h3>
+            <p>{dateLabel(d.date, locale)}</p>
+            <p>{d.note || t("No notes")}</p>
             <AdminActions
               userId={id}
               donationId={d.id}
               actions={[
-                { value: "delete-donation", label: "Delete this record" },
+                { value: "delete-donation", label: t("Delete this record") },
               ]}
             />
           </article>
         ))}
-        {!donor?.donations.length && <p>No donation records.</p>}
+        {!donor?.donations.length && <p>{t("No donation records.")}</p>}
       </section>
     </>
   );

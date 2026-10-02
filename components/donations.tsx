@@ -1,8 +1,11 @@
 "use client";
+import { dateLabel } from "@/lib/format";
+import { useLocale, useTranslation } from "@/components/language";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "./dashboard";
-import { dateLabel } from "./ui";
+
 type Record = {
   id: string;
   date: string;
@@ -17,6 +20,9 @@ export function Donations({
   records: Record[];
   today: string;
 }) {
+  const t = useTranslation();
+  const locale = useLocale();
+
   const router = useRouter();
   const [editing, setEditing] = useState<Record | null>(null);
   const [deleting, setDeleting] = useState("");
@@ -42,7 +48,7 @@ export function Donations({
             });
             setEditing(null);
             setSubmissionId(crypto.randomUUID());
-            setMessage("Donation record saved.");
+            setMessage(t("Donation record saved."));
             router.refresh();
           } catch (e) {
             setMessage((e as Error).message);
@@ -51,8 +57,8 @@ export function Donations({
           }
         }}
       >
-        <h2>{editing ? "Edit donation" : "Record a donation"}</h2>
-        <label htmlFor="date">Donation date</label>
+        <h2>{editing ? t("Edit donation") : t("Record a donation")}</h2>
+        <label htmlFor="date">{t("Donation date")}</label>
         <input
           id="date"
           name="date"
@@ -62,7 +68,7 @@ export function Donations({
           defaultValue={editing?.date}
         />
         <label htmlFor="hospital">
-          Hospital / location (optional, private)
+          {t("Hospital / location (optional, private)")}{" "}
         </label>
         <input
           id="hospital"
@@ -70,7 +76,7 @@ export function Donations({
           maxLength={120}
           defaultValue={editing?.hospital || ""}
         />
-        <label htmlFor="note">Personal note (optional, private)</label>
+        <label htmlFor="note">{t("Personal note (optional, private)")}</label>
         <textarea
           id="note"
           name="note"
@@ -78,12 +84,13 @@ export function Donations({
           defaultValue={editing?.note || ""}
         />
         <p className="muted">
-          Do not include patient identity or medical records. You can record
-          past donations.
+          {t(
+            "Do not include patient identity or medical records. You can record past donations.",
+          )}{" "}
         </p>
         <div className="actions">
           <button className="button" disabled={busy}>
-            {busy ? "Saving…" : "Save donation"}
+            {busy ? t("Saving…") : t("Save donation")}
           </button>
           {editing && (
             <button
@@ -91,27 +98,28 @@ export function Donations({
               className="text-button"
               onClick={() => setEditing(null)}
             >
-              Cancel edit
+              {t("Cancel edit")}{" "}
             </button>
           )}
         </div>
       </form>
-      <p role="status">{message}</p>
-      <h2>Your private records</h2>
+      <p role="status">{t.error(message)}</p>
+      <h2>{t("Your private records")}</h2>
       {!records.length ? (
         <div className="empty">
-          <h3>No donations recorded yet.</h3>
+          <h3>{t("No donations recorded yet.")}</h3>
           <p>
-            Add a past or recent donation. Missing records don’t mean you have
-            never donated.
+            {t(
+              "Add a past or recent donation. Missing records don’t mean you have never donated.",
+            )}{" "}
           </p>
         </div>
       ) : (
         records.map((r) => (
           <article className="record" key={r.id}>
             <div>
-              <h3>{dateLabel(r.date)}</h3>
-              <p>{r.hospital || "No location recorded"}</p>
+              <h3>{dateLabel(r.date, locale)}</h3>
+              <p>{r.hospital || t("No location recorded")}</p>
               {r.note && <p className="muted">{r.note}</p>}
             </div>
             <div className="actions">
@@ -119,17 +127,18 @@ export function Donations({
                 className="button secondary"
                 onClick={() => setEditing(r)}
               >
-                Edit
+                {t("Edit")}{" "}
               </button>
               <button className="text-button" onClick={() => setDeleting(r.id)}>
-                Delete
+                {t("Delete")}{" "}
               </button>
             </div>
             {deleting === r.id && (
               <div className="notice">
                 <p>
-                  Delete this donation record? Your public count and last date
-                  will update.
+                  {t(
+                    "Delete this donation record? Your public count and last date will update.",
+                  )}{" "}
                 </p>
                 <button
                   className="button"
@@ -139,7 +148,7 @@ export function Donations({
                     try {
                       await api("donations", { id: r.id }, "DELETE");
                       setDeleting("");
-                      setMessage("Record deleted.");
+                      setMessage(t("Record deleted."));
                       router.refresh();
                     } catch (e) {
                       setMessage((e as Error).message);
@@ -148,10 +157,10 @@ export function Donations({
                     }
                   }}
                 >
-                  Confirm deletion
+                  {t("Confirm deletion")}{" "}
                 </button>
                 <button className="text-button" onClick={() => setDeleting("")}>
-                  Cancel
+                  {t("Cancel")}{" "}
                 </button>
               </div>
             )}
