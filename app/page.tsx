@@ -9,7 +9,6 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { SearchForm } from "@/components/search";
-import { SocialIcon } from "@/components/social-icon";
 export default async function Home() {
   const t = await getTranslation();
 
@@ -92,18 +91,6 @@ export default async function Home() {
           {t("Become a donor")} <ArrowRight size={18} />
         </Link>
       </section>
-      <div className="community-invitation">
-        <a
-          className="button"
-          href="https://www.facebook.com/groups/jibondropapp"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <SocialIcon platform="Facebook" />
-          {t("Join our Facebook community")}
-          <ArrowRight size={18} aria-hidden="true" />
-        </a>
-      </div>
     </div>
   );
 }

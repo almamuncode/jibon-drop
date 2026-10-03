@@ -1,5 +1,4 @@
 export const bangla: Record<string, string> = {
-  "Join our Facebook community": "আমাদের ফেসবুক কমিউনিটিতে যোগ দিন",
   "Meet our team": "আমাদের টিমের সঙ্গে পরিচিত হোন",
   "The people building JibonDrop and connecting our community.":
     "যারা জীবনড্রপ তৈরি করছেন এবং আমাদের কমিউনিটিকে যুক্ত করছেন।",

@@ -45,13 +45,6 @@ export default async function Layout({
   const locale = await getLocale();
   const socials = [
     {
-      label: "Facebook",
-      url:
-        process.env.NEXT_PUBLIC_FACEBOOK_URL ||
-        "https://www.facebook.com/jibondropapp",
-      icon: "Facebook" as const,
-    },
-    {
       label: "Instagram",
       url: process.env.NEXT_PUBLIC_INSTAGRAM_URL,
       icon: "Instagram" as const,
