@@ -1,7 +1,7 @@
 import { getLocale, getTranslation } from "@/lib/i18n-server";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { Droplet } from "lucide-react";
 import { SocialIcon } from "@/components/social-icon";
 import { PwaInstall } from "@/components/pwa";
 import { AuthNavigation, MobileNavigation } from "@/components/auth-navigation";
@@ -78,26 +78,13 @@ export default async function Layout({
           <header className="site-header">
             <div className="nav-wrap">
               <Link className="wordmark" href="/">
-                <span className="brand-logo" aria-hidden="true">
-                  <Image
-                    className="brand-logo-original"
-                    src="/icons/logo.png"
-                    alt=""
-                    width={706}
-                    height={981}
-                    sizes="36px"
-                  />
-                  <Image
-                    className="brand-logo-white"
-                    src="/icons/logo-white.png"
-                    alt=""
-                    width={707}
-                    height={981}
-                    sizes="36px"
-                  />
+                <span className="brand-icon">
+                  <Droplet size={22} strokeWidth={1.8} />
                 </span>
                 <span className="brand-name">
-                  <span lang="en">JibonDrop</span>
+                  <span lang="en">
+                    Jibon<span>Drop</span>
+                  </span>
                   <small lang="bn">জীবনড্রপ</small>
                 </span>
               </Link>
@@ -110,32 +97,11 @@ export default async function Layout({
           <main id="main">{children}</main>
           <footer>
             <div>
-              <Link className="wordmark footer-wordmark" href="/">
-                <span className="brand-logo" aria-hidden="true">
-                  <Image
-                    className="brand-logo-original"
-                    src="/icons/logo.png"
-                    alt=""
-                    width={706}
-                    height={981}
-                    sizes="36px"
-                  />
-                  <Image
-                    className="brand-logo-white"
-                    src="/icons/logo-white.png"
-                    alt=""
-                    width={707}
-                    height={981}
-                    sizes="36px"
-                  />
-                </span>
-                <span className="footer-brand-name">
-                  {t("Jibon")}
-                  <span>{t("Drop")}</span>
-                </span>
+              <Link className="wordmark" href="/">
+                {t("Jibon")}
+                <span>{t("Drop")}</span>
               </Link>
               <p>{t("A drop of blood. A gift of life.")}</p>
-              <PwaInstall />
               {socials.length > 0 && (
                 <div className="footer-socials" aria-label={t("Social media")}>
                   {socials.map(({ label, url, icon }) => (
@@ -151,6 +117,7 @@ export default async function Layout({
                   ))}
                 </div>
               )}
+              <PwaInstall />
             </div>
             <div>
               <nav className="footer-links" aria-label={t("Helpful links")}>
