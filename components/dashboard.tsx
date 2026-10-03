@@ -108,45 +108,54 @@ export function StatusControls({
   visible: boolean;
 }) {
   const t = useTranslation();
-
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  async function update(next: { available: boolean; visible: boolean }) {
-    setBusy(true);
-    try {
-      await api("status", next, "PATCH");
-      router.refresh();
-      setMessage(t("Status updated."));
-    } catch (e) {
-      setMessage((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
+  const [current, setCurrent] = useState(available);
   return (
-    <div>
-      <label className="check">
-        <input
-          type="checkbox"
-          checked={available}
+    <div className="availability-control">
+      <div className="availability-row">
+        <div>
+          <strong>{t("Available to donate now")}</strong>
+          <p className="muted">
+            {current ? t("Willing to donate") : t("Temporarily unavailable")}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="availability-switch"
+          role="switch"
+          aria-checked={current}
+          aria-label={t("Available to donate now")}
           disabled={busy}
-          onChange={(e) => update({ available: e.target.checked, visible })}
-        />
-        {t("Available to help")}{" "}
-      </label>
-      <label className="check">
-        <input
-          type="checkbox"
-          checked={visible}
-          disabled={busy}
-          onChange={(e) => update({ available, visible: e.target.checked })}
-        />
-        {t("Show my directory listing")}{" "}
-      </label>
-      <p role="status" className="muted">
-        {t.error(message)}
+          onClick={async () => {
+            setBusy(true);
+            setMessage("");
+            try {
+              await api("status", { available: !current, visible }, "PATCH");
+              setCurrent(!current);
+              setMessage(t("Status updated."));
+              router.refresh();
+            } catch (error) {
+              setMessage((error as Error).message);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <span />
+        </button>
+      </div>
+      <p className="muted availability-note">
+        {t(
+          "Availability is your willingness to donate, not medical clearance.",
+        )}
       </p>
+      {message && (
+        <p role="status" className="muted">
+          {t.error(message)}
+        </p>
+      )}
     </div>
   );
 }

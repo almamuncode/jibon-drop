@@ -520,6 +520,7 @@ footer a:not(.wordmark) {
 .avatar {
   width: 64px;
   height: 64px;
+  flex-shrink: 0;
   border-radius: 50%;
   overflow: hidden;
   background: var(--soft);
@@ -1788,7 +1789,7 @@ textarea {
     height: 36px;
   }
   .account-dropdown {
-    right: -50px;
+    right: 0;
   }
   .donor-welcome {
     padding: 24px;
@@ -2092,4 +2093,851 @@ html[lang="bn"] :is(h1, h2, h3) {
 .facebook-field input {
   flex: 1;
   min-width: 0;
+}
+
+/* Simple profile sections and quick dashboard availability. */
+.profile-form {
+  max-width: 760px;
+}
+.profile-form-heading h2 {
+  margin: 0 0 6px;
+}
+.profile-form-heading {
+  margin-bottom: 28px;
+}
+.profile-section {
+  border: 0;
+  padding: 0;
+  margin: 0 0 32px;
+  min-width: 0;
+}
+.profile-section legend {
+  width: 100%;
+  padding: 0 0 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+  font-size: 17px;
+  font-weight: 700;
+}
+.profile-form .muted {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 6px 0 16px;
+}
+.profile-extra,
+.profile-privacy {
+  margin-top: 20px;
+}
+.profile-extra summary,
+.profile-privacy summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.profile-privacy {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0;
+}
+.profile-form-actions {
+  margin-top: 24px;
+}
+.profile-form .location-grid-simple select {
+  border-radius: 12px;
+}
+.location-search-toggle {
+  margin-top: 8px;
+  padding-left: 0;
+}
+.compact-availability {
+  padding: 20px 24px;
+}
+.availability-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.availability-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+.availability-switch {
+  width: 46px;
+  height: 26px;
+  border: 1px solid var(--input-line);
+  border-radius: 999px;
+  padding: 3px;
+  background: var(--input-line);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.availability-switch span {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 150ms ease;
+}
+.availability-switch[aria-checked="true"] {
+  background: var(--success);
+  border-color: var(--success);
+}
+.availability-switch[aria-checked="true"] span {
+  transform: translateX(20px);
+}
+.availability-switch:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.availability-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .availability-switch span {
+    transition: none;
+  }
+}
+
+.profile-preferences .preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.preference-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.preference-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+}
+.preference-row input[role="switch"] {
+  appearance: none;
+  width: 40px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--input-line);
+  border-radius: 999px;
+  background: var(--input-line);
+  cursor: pointer;
+}
+.preference-row input[role="switch"]::before {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 3px;
+  border-radius: 50%;
+  background: #fff;
+}
+.preference-row input[role="switch"]:checked {
+  background: var(--success);
+  border-color: var(--success);
+}
+.preference-row input[role="switch"]:checked::before {
+  transform: translateX(16px);
+}
+.profile-preferences .privacy-help {
+  margin-top: 8px;
+}
+.privacy-help summary {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.dashboard-tabs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.dashboard-tabs a[aria-current="page"] {
+  color: var(--red);
+}
+@media (max-width: 640px) {
+  .dashboard-tabs {
+    display: none;
+  }
+}
+
+.nav-wrap .notification-bell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.notification-bell .unread-badge {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+}
+.notification-bell:hover {
+  background: var(--soft);
+}
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.notification-item:last-child {
+  border-bottom: 0;
+}
+.notification-item > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.notification-item > svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.notification-item p {
+  margin: 4px 0;
+}
+.notification-new {
+  display: inline-block;
+  margin-inline-start: 8px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--red);
+  font-size: 11px;
+}
+@media (max-width: 640px) {
+  .nav-wrap .notification-bell {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+.menu-preferences {
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+  padding: 8px 12px;
+}
+.menu-preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  font-size: 13px;
+}
+.account-dropdown .menu-preferences .language-toggle button {
+  width: auto;
+  min-height: 32px;
+  padding: 5px 9px;
+  font-size: 12px;
+  color: var(--muted);
+  border-radius: 8px;
+}
+.account-dropdown
+  .menu-preferences
+  .language-toggle
+  button[aria-pressed="true"] {
+  color: var(--red);
+  background: var(--surface);
+}
+.nav-wrap .menu-preferences .theme-toggle {
+  width: 84px;
+  min-width: 84px;
+  min-height: 34px;
+  padding: 6px 10px;
+  margin: 0;
+}
+.menu-preferences .theme-toggle span {
+  display: inline;
+  font-size: 12px;
+}
+.menu-preferences .theme-toggle svg {
+  display: none;
+}
+.preferences-menu .menu-preferences {
+  border-top: 0;
+  margin-top: 0;
+}
+.preferences-menu summary {
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.account-dropdown {
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
+}
+
+.account-dropdown .menu-preferences .language-toggle {
+  background: var(--subtle);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+.account-dropdown .menu-preferences .language-toggle button {
+  min-width: 42px;
+  min-height: 36px;
+  justify-content: center;
+  font-weight: 700;
+}
+.account-dropdown
+  .menu-preferences
+  .language-toggle
+  button[aria-pressed="true"] {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+}
+.appearance-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  cursor: pointer;
+  min-height: 44px;
+  font-size: 12px;
+}
+.appearance-toggle input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.appearance-toggle:has(input:focus-visible) {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+.appearance-toggle .appearance-dark {
+  display: none;
+}
+.appearance-toggle:has(input:checked) .appearance-light {
+  display: none;
+}
+.appearance-toggle:has(input:checked) .appearance-dark {
+  display: inline;
+}
+.appearance-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 58px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--input-line);
+  border-radius: 999px;
+  background: var(--subtle);
+  color: var(--muted);
+  pointer-events: none;
+}
+.appearance-thumb {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+}
+.appearance-toggle:has(input:checked) .appearance-thumb {
+  transform: translateX(26px);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+.footer-socials {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+footer .footer-socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+footer .footer-socials a:hover {
+  background: var(--soft);
+  color: var(--red);
+}
+
+.profile-health-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.profile-health-fields input {
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .profile-health-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.mobile-profile-content {
+  display: none;
+}
+.profile-summary-details > summary {
+  display: none;
+}
+.profile-summary-details:not([open]) > .profile-details {
+  display: grid;
+}
+.profile-edit-button {
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .user-profile-page > .page-intro {
+    margin-bottom: 18px;
+  }
+  .user-profile-page > .page-intro p {
+    display: none;
+  }
+  .user-profile-page .profile-overview {
+    padding: 0 20px 24px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .profile-overview .profile-identity {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 54px;
+    margin: 0 -20px 24px;
+    text-align: center;
+    background: linear-gradient(var(--primary) 0 100px, var(--surface) 100px);
+  }
+  .profile-overview .profile-identity .avatar {
+    width: 94px;
+    height: 94px;
+    border: 5px solid var(--surface);
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+  .profile-overview .profile-identity h2 {
+    margin: 4px 0;
+    font-size: 22px;
+  }
+  .profile-overview .profile-identity p {
+    margin: 0;
+    padding: 0 20px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .profile-overview .profile-identity .eyebrow,
+  .profile-overview .profile-identity .blood-badge {
+    display: none;
+  }
+  .mobile-profile-content {
+    display: block;
+  }
+  .mobile-profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+  .mobile-profile-stats > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 6px;
+    border-radius: 14px;
+    background: var(--subtle);
+    text-align: center;
+  }
+  .mobile-profile-stats strong {
+    font-size: 23px;
+    line-height: 1.2;
+  }
+  .mobile-profile-stats span {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .mobile-profile-availability {
+    padding: 14px;
+    background: var(--subtle);
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .mobile-profile-availability strong {
+    font-size: 13px;
+  }
+  .mobile-profile-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 14px;
+    margin-bottom: 10px;
+    background: var(--subtle);
+    border-radius: 12px;
+    font-size: 13px;
+  }
+  .mobile-profile-action span {
+    flex: 1;
+  }
+  .profile-summary-details > summary {
+    display: list-item;
+    padding: 14px 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .profile-summary-details:not([open]) > .profile-details {
+    display: none;
+  }
+  .profile-overview .profile-edit-button {
+    width: 100%;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  .profile-account-actions {
+    margin-top: 20px;
+  }
+}
+
+/* Mobile donation experience: concise actions, clear selection and calm cards. */
+.home-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1136px;
+  margin: 0 auto 56px;
+}
+.home-shortcuts > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.home-shortcuts > a > span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: var(--red);
+  background: var(--soft);
+  border-radius: 14px;
+}
+.home-shortcuts > a > div {
+  flex: 1;
+  min-width: 0;
+}
+.home-shortcuts small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.home-shortcuts > a:hover {
+  border-color: var(--red);
+}
+.blood-group-picker {
+  padding: 0;
+  margin: 16px 0 20px;
+  border: 0;
+  min-width: 0;
+}
+.blood-group-picker legend {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.blood-group-picker > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.blood-group-picker label {
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+}
+.blood-group-picker input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.blood-group-picker label > span {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border: 1px solid var(--input-line);
+  border-radius: 12px;
+  color: var(--red);
+  background: var(--surface);
+  font-size: 15px;
+  font-weight: 700;
+}
+.blood-group-picker input:checked + span {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.blood-group-picker input:focus-visible + span {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+.search-panel .location-grid-simple select {
+  border-radius: 12px;
+}
+@media (max-width: 640px) {
+  .home-experience .hero {
+    margin: 16px 16px 20px;
+    padding: 24px;
+    border-radius: 24px;
+    gap: 24px;
+  }
+  .home-experience .hero h1 {
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.8px;
+    margin: 12px 0;
+  }
+  .home-experience .hero-symbol {
+    display: none;
+  }
+  .home-experience .hero .lead {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .home-experience .hero .trust {
+    margin-top: 18px;
+    font-size: 11px;
+  }
+  .home-experience .hero .search-panel {
+    padding: 20px;
+    border-radius: 18px;
+    margin: 0 -10px -10px;
+  }
+  .home-shortcuts {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 0 16px 32px;
+  }
+  .home-shortcuts > a {
+    padding: 14px;
+    border-radius: 16px;
+  }
+  .home-experience .how {
+    padding-top: 12px;
+  }
+  .home-experience .section-title h2 {
+    font-size: 25px;
+    line-height: 1.3;
+  }
+  .home-experience .steps article {
+    padding: 22px;
+    border-radius: 20px;
+  }
+  .home-experience .join {
+    border-radius: 24px;
+    margin: 24px 16px;
+    padding: 24px;
+  }
+  .donor-search-page .page-intro,
+  .user-dashboard .page-intro {
+    margin-bottom: 22px;
+  }
+  .donor-search-page .page-intro h1,
+  .user-dashboard .page-intro h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.6px;
+  }
+  .donor-search-page .page-intro .eyebrow,
+  .user-dashboard .page-intro .eyebrow {
+    display: none;
+  }
+  .donor-search-page .search-panel {
+    padding: 20px;
+    border-radius: 20px;
+  }
+  .donor-search-page .donor-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .donor-search-page .donor-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+    padding: 20px;
+    border-radius: 20px;
+  }
+  .donor-search-page .donor-card .card-top {
+    grid-column: 1 / -1;
+    margin-bottom: 2px;
+  }
+  .donor-search-page .donor-card h3 {
+    grid-column: 1;
+    margin: 0;
+    font-size: 18px;
+  }
+  .donor-search-page .donor-card > p {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 13px;
+  }
+  .donor-search-page .donor-card > .status {
+    grid-column: 1 / -1;
+    justify-self: start;
+    font-size: 11px;
+  }
+  .donor-search-page .donor-card dl {
+    grid-column: 1 / -1;
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--subtle);
+  }
+  .donor-search-page .donor-card > .text-link {
+    grid-column: 1 / -1;
+    justify-content: center;
+    min-height: 44px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+  .user-dashboard .dashboard-panel {
+    border-radius: 20px;
+  }
+  .user-dashboard .donor-welcome {
+    border-radius: 24px;
+    padding: 24px;
+  }
+  .user-dashboard .stats {
+    gap: 8px;
+  }
+  .user-dashboard .stats article {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+  .public-donor-page .profile-card {
+    padding: 48px 24px 24px;
+    border-radius: 24px;
+    text-align: center;
+    background: linear-gradient(var(--primary) 0 96px, var(--surface) 96px);
+  }
+  .public-donor-page .avatar {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 18px;
+    border: 5px solid var(--surface);
+  }
+  .public-donor-page h1 {
+    font-size: 24px;
+    margin: 12px 0 6px;
+  }
+  .public-donor-page .profile-card dl {
+    background: var(--subtle);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: left;
+  }
+  .public-donor-page .donor-contact {
+    text-align: left;
+  }
+  .mobile-nav {
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -6px 24px rgb(0 0 0 / 5%);
+    padding-top: 8px;
+  }
+  .mobile-nav a {
+    min-height: 52px;
+    border-radius: 14px;
+    margin: 0 4px;
+    font-size: 11px;
+  }
+  .mobile-nav a[aria-current="page"] {
+    background: var(--soft);
+  }
+}
+
+.search-location-options {
+  margin: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.search-location-options summary {
+  padding: 14px 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.search-location-options summary span {
+  margin-inline-start: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.search-location-options[open] {
+  padding-bottom: 16px;
+}
+@media (max-width: 640px) {
+  .home-experience .hero {
+    background: transparent;
+    padding: 0;
+    gap: 16px;
+  }
+  .home-experience .hero-copy {
+    background: var(--primary);
+    padding: 26px;
+    border-radius: 24px;
+  }
+  .home-experience .hero .search-panel {
+    margin: 0;
+    border: 1px solid var(--line);
+    box-shadow: none;
+    border-radius: 20px;
+  }
 }

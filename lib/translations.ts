@@ -1,4 +1,58 @@
 export const bangla: Record<string, string> = {
+  "This contact number is already used by another donor profile.":
+    "এই নম্বর অন্য একটি রক্তদাতা প্রোফাইলে ব্যবহৃত হচ্ছে।",
+  "These details are already used by another profile.":
+    "এই তথ্য অন্য একটি প্রোফাইলে ব্যবহৃত হচ্ছে।",
+  "The database needs an update. Please contact the site owner.":
+    "ডেটাবেস হালনাগাদ প্রয়োজন। সাইটের পরিচালকের সঙ্গে যোগাযোগ করুন।",
+  "Saving timed out. Please try again.":
+    "সংরক্ষণের সময় শেষ হয়ে গেছে। আবার চেষ্টা করুন।",
+  "The database is temporarily unavailable. Please try again.":
+    "ডেটাবেস সাময়িকভাবে অনুপলব্ধ। আবার চেষ্টা করুন।",
+  "Date of birth (optional)": "জন্মতারিখ (ঐচ্ছিক)",
+  "Weight in kg (optional)": "ওজন কেজিতে (ঐচ্ছিক)",
+  "Date of birth": "জন্মতারিখ",
+  "Weight (kg)": "ওজন (কেজি)",
+  "Your date of birth and weight stay private.":
+    "আপনার জন্মতারিখ ও ওজন গোপন থাকবে।",
+  "Choose a valid date of birth that is not in the future.":
+    "ভবিষ্যতের নয় এমন সঠিক জন্মতারিখ বেছে নিন।",
+  Language: "ভাষা",
+  Appearance: "থিম",
+  Preferences: "পছন্দসমূহ",
+
+  Notifications: "বিজ্ঞপ্তি",
+  "Your latest updates, all in one place.":
+    "আপনার সাম্প্রতিক সব খবর এক জায়গায়।",
+  "Contact request": "যোগাযোগের অনুরোধ",
+  "No notifications yet": "এখনও কোনো বিজ্ঞপ্তি নেই",
+  "New contact requests will appear here.":
+    "নতুন যোগাযোগের অনুরোধ এখানে দেখা যাবে।",
+  "Privacy & listing": "গোপনীয়তা ও তালিকা",
+  "List me in the donor directory": "রক্তদাতার তালিকায় আমাকে দেখান",
+  "I consent to a public donor profile":
+    "আমি রক্তদাতা প্রোফাইল প্রকাশে সম্মতি দিচ্ছি",
+  "Consent is required to list your profile. You can withdraw it at any time.":
+    "তালিকায় প্রোফাইল দেখাতে সম্মতি প্রয়োজন। যেকোনো সময় তা প্রত্যাহার করতে পারেন।",
+  "Accept contact requests": "যোগাযোগের অনুরোধ গ্রহণ করুন",
+  "Share my number without approval": "অনুমোদন ছাড়াই আমার নম্বর দেখান",
+  "Signed-in users only": "শুধু সাইন ইন করা ব্যবহারকারীদের",
+  "How contact sharing works": "যোগাযোগের তথ্য কীভাবে শেয়ার হয়",
+  "When contact requests are enabled, you approve each request unless you enable sharing without approval. Turning requests off revokes approved access. Signed-out visitors never see your number. Facebook follows the same sharing settings.":
+    "যোগাযোগের অনুরোধ চালু থাকলে প্রতিটি অনুরোধ আপনি অনুমোদন করবেন, যদি অনুমোদন ছাড়া নম্বর দেখানোর ব্যবস্থা চালু না করেন। অনুরোধ বন্ধ করলে আগের অনুমোদিত প্রবেশাধিকার বাতিল হয়। সাইন ইন না করা দর্শক আপনার নম্বর দেখেন না। ফেসবুকের জন্যও একই নিয়ম প্রযোজ্য।",
+  "Anyone can search listed profiles. Turn off your directory listing to hide yours.":
+    "তালিকাভুক্ত প্রোফাইল যে কেউ খুঁজতে পারেন। আপনার প্রোফাইল লুকাতে তালিকায় দেখানো বন্ধ করুন।",
+  "Hide location search": "ঠিকানা অনুসন্ধান লুকান",
+  "Search location options": "ঠিকানা খুঁজুন",
+  "Edit donor profile": "রক্তদাতা প্রোফাইল সম্পাদনা",
+  "Keep your contact details and location up to date.":
+    "যোগাযোগের তথ্য ও ঠিকানা হালনাগাদ রাখুন।",
+  "Personal details": "ব্যক্তিগত তথ্য",
+  "Area not listed?": "আপনার এলাকা তালিকায় নেই?",
+  "Availability, privacy & listing": "রক্তদানের প্রস্তুতি, গোপনীয়তা ও তালিকা",
+  "Choose who can find you and contact you.":
+    "কে আপনাকে খুঁজে পাবে ও যোগাযোগ করতে পারবে তা বেছে নিন।",
+  "Available to donate now": "এখন রক্তদান করতে ইচ্ছুক",
   "unread notifications": "অপঠিত বিজ্ঞপ্তি",
   "We couldn’t refresh notifications.": "বিজ্ঞপ্তি হালনাগাদ করা যায়নি।",
   "Checking for new requests…": "নতুন অনুরোধ খোঁজা হচ্ছে…",

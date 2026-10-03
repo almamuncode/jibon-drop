@@ -31,7 +31,7 @@ export function ThemeToggle() {
   }, []);
 
   return (
-    <label className="theme-toggle" title={t("Toggle dark mode")}>
+    <label className="appearance-toggle" title={t("Toggle dark mode")}>
       <input
         ref={input}
         id="theme-switch"
@@ -46,13 +46,16 @@ export function ThemeToggle() {
           } catch {}
         }}
       />
-      <Sun className="theme-sun" size={18} aria-hidden="true" />
-      <Moon className="theme-moon" size={18} aria-hidden="true" />
-      <span className="theme-sun" aria-hidden="true">
-        {t("Light")}{" "}
+      <span className="appearance-light" aria-hidden="true">
+        {t("Light")}
       </span>
-      <span className="theme-moon" aria-hidden="true">
-        {t("Dark")}{" "}
+      <span className="appearance-dark" aria-hidden="true">
+        {t("Dark")}
+      </span>
+      <span className="appearance-track" aria-hidden="true">
+        <Sun size={14} />
+        <Moon size={14} />
+        <span className="appearance-thumb" />
       </span>
     </label>
   );

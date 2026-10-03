@@ -20,21 +20,36 @@ export function SearchForm({
         <span>{t("Find a donor")}</span>
         <span className="muted">{t("No account needed")}</span>
       </div>
-      <label htmlFor="bloodGroup">
-        {t("Blood group")} <span className="red">*</span>
-      </label>
-      <select
-        id="bloodGroup"
-        name="bloodGroup"
-        required
-        defaultValue={filters.bloodGroup || ""}
+      <fieldset className="blood-group-picker">
+        <legend>
+          {t("Blood group")} <span className="red">*</span>
+        </legend>
+        <div>
+          {bloodGroups.map((group) => (
+            <label key={group}>
+              <input
+                type="radio"
+                name="bloodGroup"
+                value={group}
+                required
+                defaultChecked={filters.bloodGroup === group}
+              />
+              <span>{group}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <details
+        className="search-location-options"
+        open={Object.keys(filters).some(
+          (key) => key.endsWith("Id") && !!filters[key],
+        )}
       >
-        <option value="">{t("Choose blood group")}</option>
-        {bloodGroups.map((x) => (
-          <option key={x}>{x}</option>
-        ))}
-      </select>
-      <Locations key={JSON.stringify(filters)} initial={filters} />
+        <summary>
+          {t("Location")} <span>{t("Optional")}</span>
+        </summary>
+        <Locations compact key={JSON.stringify(filters)} initial={filters} />
+      </details>
       {!compact && (
         <div className="filter-bottom">
           <label className="check">

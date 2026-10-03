@@ -20,7 +20,7 @@ export default async function Profile({
   });
   if (!d) notFound();
   return (
-    <div className="container narrow">
+    <div className="container narrow public-donor-page">
       <article className="profile-card">
         <Avatar name={d.name} url={d.imageUrl} />
         <span className="blood-badge">{d.bloodGroup}</span>
@@ -31,7 +31,7 @@ export default async function Profile({
             locale,
           )}
         </p>
-        <span className="status">
+        <span className={"status " + (!d.available ? "unavailable" : "")}>
           {d.available ? t("Available") : t("Temporarily unavailable")}
         </span>
         <dl>

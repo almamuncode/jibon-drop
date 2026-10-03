@@ -14,10 +14,12 @@ export function Locations({
   initial,
   onChange,
   required = false,
+  compact = false,
 }: {
   initial?: Partial<LocationValue>;
   onChange?: (v: LocationValue) => void;
   required?: boolean;
+  compact?: boolean;
 }) {
   const t = useTranslation();
   const locale = useLocale();
@@ -30,6 +32,7 @@ export function Locations({
     ...initial,
   });
   const [options, setOptions] = useState<Item[][]>([[], [], [], []]);
+  const [searching, setSearching] = useState(false);
   const [queries, setQueries] = useState(["", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,7 +80,22 @@ export function Locations({
   }
   return (
     <>
-      <div className="location-grid">
+      {compact && (
+        <button
+          className="text-button location-search-toggle"
+          type="button"
+          aria-expanded={searching}
+          onClick={() => {
+            setSearching(!searching);
+            setQueries(["", "", "", ""]);
+          }}
+        >
+          {searching ? t("Hide location search") : t("Search location options")}
+        </button>
+      )}
+      <div
+        className={`location-grid${compact && !searching ? " location-grid-simple" : ""}`}
+      >
         {keys.map((key, i) => (
           <div key={key}>
             <label htmlFor={key}>
@@ -90,20 +108,24 @@ export function Locations({
                 ][i]
               }
             </label>
-            <input
-              aria-label={
-                t("Search ") +
-                [t("divisions"), t("districts"), t("localities"), t("areas")][i]
-              }
-              placeholder={t("Type to filter options")}
-              value={queries[i]}
-              disabled={i > 0 && !value[keys[i - 1]]}
-              onChange={(e) =>
-                setQueries(
-                  queries.map((q, j) => (i === j ? e.target.value : q)),
-                )
-              }
-            />
+            {(!compact || searching) && (
+              <input
+                aria-label={
+                  t("Search ") +
+                  [t("divisions"), t("districts"), t("localities"), t("areas")][
+                    i
+                  ]
+                }
+                placeholder={t("Type to filter options")}
+                value={queries[i]}
+                disabled={i > 0 && !value[keys[i - 1]]}
+                onChange={(e) =>
+                  setQueries(
+                    queries.map((q, j) => (i === j ? e.target.value : q)),
+                  )
+                }
+              />
+            )}
             <select
               id={key}
               name={key}

@@ -74,6 +74,13 @@ export default async function Dashboard() {
           <Link href="/dashboard/profile">{t("Set up my profile →")}</Link>
         </div>
       )}
+      <div className="dashboard-panel compact-availability">
+        <StatusControls
+          key={`${d.available}-${d.visible}`}
+          available={d.available}
+          visible={d.visible}
+        />
+      </div>
       <div className="stats">
         <article>
           <Heart size={22} className="red" aria-hidden="true" />
@@ -130,25 +137,6 @@ export default async function Dashboard() {
           </div>
         )}
       </section>
-      <div className="dashboard-panel">
-        <h2>
-          {d.available ? t("Available to help") : t("Temporarily unavailable")}
-        </h2>
-        <p>
-          {t(
-            "Availability is your willingness to donate, not medical clearance.",
-          )}{" "}
-        </p>
-        <StatusControls available={d.available} visible={d.visible} />
-        <div className="actions">
-          <Link className="button" href="/dashboard/donations">
-            {t("Add a donation")}{" "}
-          </Link>
-          <Link className="button secondary" href="/dashboard/profile">
-            {t("Manage profile & availability")}{" "}
-          </Link>
-        </div>
-      </div>
       <p className="muted">
         {t(
           "Eligibility must be confirmed by the relevant blood bank or healthcare professional.",

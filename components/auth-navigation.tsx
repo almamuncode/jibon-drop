@@ -3,9 +3,12 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { PreferencesMenu } from "./menu-preferences";
 import { AccountMenu } from "./account-menu";
 import { MobileNav } from "./mobile-nav";
 import { cache } from "react";
+import { Bell } from "lucide-react";
+import { UnreadBadge } from "./notifications";
 import { unreadCount } from "@/lib/notifications";
 
 const navigationSession = cache(async () => {
@@ -36,6 +39,7 @@ export async function AuthNavigation() {
           {t("Become a Donor")}{" "}
         </Link>
         <Link href="/login">{t("Login")}</Link>
+        <PreferencesMenu />
       </>
     );
   const user = await db().user.findUnique({
@@ -52,13 +56,24 @@ export async function AuthNavigation() {
   });
   const unreadNotifications = await unreadCount(session.user.id);
   return (
-    <AccountMenu
-      unreadNotifications={unreadNotifications}
-      isAdmin={user?.role === "ADMIN"}
-      pendingRequests={donor?._count.contactRequests || 0}
-      name={donor?.name || session.user.name}
-      email={session.user.email}
-      image={donor?.imageUrl || session.user.image || null}
-    />
+    <>
+      <Link
+        className="notification-bell"
+        href="/dashboard/notifications"
+        aria-label={t("Notifications")}
+        title={t("Notifications")}
+      >
+        <Bell size={20} aria-hidden="true" />
+        <UnreadBadge initial={unreadNotifications} />
+      </Link>
+      <AccountMenu
+        unreadNotifications={unreadNotifications}
+        isAdmin={user?.role === "ADMIN"}
+        pendingRequests={donor?._count.contactRequests || 0}
+        name={donor?.name || session.user.name}
+        email={session.user.email}
+        image={donor?.imageUrl || session.user.image || null}
+      />
+    </>
   );
 }

@@ -52,6 +52,20 @@ export const profileSchema = z
     name: z.string().trim().min(2).max(80),
     phone: z.string().trim().min(1).max(40),
     bloodGroup: z.enum(bloodGroups),
+    dateOfBirth: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .refine(
+        (value) =>
+          !isNaN(Date.parse(value)) &&
+          new Date(value).toISOString().slice(0, 10) === value &&
+          value >= "1900-01-01" &&
+          value <= dhakaToday(),
+        "Choose a valid date of birth that is not in the future.",
+      )
+      .nullable()
+      .optional(),
+    weightKg: z.number().finite().positive().max(500).nullable().optional(),
     divisionId: z.string().min(1),
     districtId: z.string().min(1),
     localityId: z.string().nullable(),

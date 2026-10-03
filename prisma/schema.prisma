@@ -28,6 +28,8 @@ model Donor {
  phoneVerifiedAt DateTime?
  name String @default("")
  bloodGroup String @default("")
+ dateOfBirth DateTime? @db.Date
+ weightKg Float?
  divisionId String?
  districtId String?
  localityId String?

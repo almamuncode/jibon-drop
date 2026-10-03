@@ -10,7 +10,10 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Heart,
+  MessageCircle,
 } from "lucide-react";
+import { MenuPreferences } from "./menu-preferences";
 import { Avatar } from "./ui";
 import { authClient } from "@/lib/auth-client";
 import { UnreadBadge } from "@/components/notifications";
@@ -83,11 +86,16 @@ export function AccountMenu({
             icon: UserRound,
           },
           {
+            href: "/dashboard/donations",
+            label: t("Donation records"),
+            icon: Heart,
+          },
+          {
             href: "/dashboard/requests",
             label:
               t("Contact requests") +
               (pendingRequests ? ` (${pendingRequests})` : ""),
-            icon: UserRound,
+            icon: MessageCircle,
           },
           { href: "/dashboard/settings", label: t("Settings"), icon: Settings },
         ].map(({ href, label, icon: Icon }) => (
@@ -99,6 +107,7 @@ export function AccountMenu({
             )}
           </Link>
         ))}
+        <MenuPreferences />
         <button
           type="button"
           disabled={busy}

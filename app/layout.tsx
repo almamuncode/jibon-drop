@@ -2,10 +2,10 @@ import { getLocale, getTranslation } from "@/lib/i18n-server";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Droplet } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { SocialIcon } from "@/components/social-icon";
 import { PwaInstall } from "@/components/pwa";
 import { AuthNavigation, MobileNavigation } from "@/components/auth-navigation";
-import { LanguageProvider, LanguageToggle } from "@/components/language";
+import { LanguageProvider } from "@/components/language";
 import "./site.css";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -43,6 +43,28 @@ export default async function Layout({
 }) {
   const t = await getTranslation();
   const locale = await getLocale();
+  const socials = [
+    {
+      label: "Facebook",
+      url: process.env.NEXT_PUBLIC_FACEBOOK_URL,
+      icon: "Facebook" as const,
+    },
+    {
+      label: "Instagram",
+      url: process.env.NEXT_PUBLIC_INSTAGRAM_URL,
+      icon: "Instagram" as const,
+    },
+    {
+      label: "YouTube",
+      url: process.env.NEXT_PUBLIC_YOUTUBE_URL,
+      icon: "YouTube" as const,
+    },
+    {
+      label: "LinkedIn",
+      url: process.env.NEXT_PUBLIC_LINKEDIN_URL,
+      icon: "LinkedIn" as const,
+    },
+  ].filter((item) => item.url && /^https:\/\//.test(item.url));
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -65,8 +87,6 @@ export default async function Layout({
               <nav aria-label={t("Main navigation")}>
                 <Link href="/find-donors">{t("Find donors")}</Link>
                 <AuthNavigation />
-                <LanguageToggle />
-                <ThemeToggle />
               </nav>
             </div>
           </header>
@@ -79,9 +99,28 @@ export default async function Layout({
               </Link>
               <p>{t("A drop of blood. A gift of life.")}</p>
               <PwaInstall />
+              {socials.length > 0 && (
+                <div className="footer-socials" aria-label={t("Social media")}>
+                  {socials.map(({ label, url, icon }) => (
+                    <a
+                      key={label}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                    >
+                      <SocialIcon platform={icon} />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
-              <Link href="/privacy">{t("Privacy & contact guidance")}</Link>
+              <nav className="footer-links" aria-label={t("Helpful links")}>
+                <Link href="/about">{t("About Us")}</Link>
+                <Link href="/privacy">{t("Privacy")}</Link>
+                <Link href="/guide">{t("User Guide")}</Link>
+              </nav>
               <p>
                 {t("For urgent care, contact your hospital or blood bank.")}
               </p>

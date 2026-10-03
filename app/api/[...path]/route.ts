@@ -115,37 +115,46 @@ async function handle(
       const facebook = normalizeFacebook(facebookInput ?? "");
       const canonical = normalizePhone(parsed.phone);
       if (!donor.userId) throw new Error("Please log in again.");
-      await db().$transaction(async (tx) => {
-        await tx.$executeRaw`SELECT id FROM "Donor" WHERE id=${donor.id} FOR UPDATE`;
-        const current = await tx.donor.findUniqueOrThrow({
-          where: { id: donor.id },
-        });
-        const sharePhone = parsed.sharePhone ?? current.sharePhone;
-        const phonePublic = parsed.phonePublic ?? current.phonePublic;
-        await tx.donor.update({
-          where: { id: donor.id },
-          data: {
-            ...data,
-            sharePhone,
-            phonePublic,
-            facebook,
-            phone: canonical,
-            phoneVerifiedAt:
-              current.phone === canonical ? current.phoneVerifiedAt : null,
-            consentAt: consent ? current.consentAt || new Date() : null,
-          },
-        });
-        if (
-          !sharePhone ||
-          !consent ||
-          !parsed.visible ||
-          current.phone !== canonical
-        )
-          await tx.contactRequest.updateMany({
-            where: { donorId: donor.id, status: "APPROVED" },
-            data: { status: "REVOKED", phoneHash: null, expiresAt: null },
+      await db().$transaction(
+        async (tx) => {
+          await tx.$executeRaw`SELECT id FROM "Donor" WHERE id=${donor.id} FOR UPDATE`;
+          const current = await tx.donor.findUniqueOrThrow({
+            where: { id: donor.id },
           });
-      });
+          const sharePhone = parsed.sharePhone ?? current.sharePhone;
+          const phonePublic = parsed.phonePublic ?? current.phonePublic;
+          await tx.donor.update({
+            where: { id: donor.id },
+            data: {
+              ...data,
+              dateOfBirth:
+                parsed.dateOfBirth === undefined
+                  ? undefined
+                  : parsed.dateOfBirth
+                    ? new Date(`${parsed.dateOfBirth}T00:00:00.000Z`)
+                    : null,
+              sharePhone,
+              phonePublic,
+              facebook,
+              phone: canonical,
+              phoneVerifiedAt:
+                current.phone === canonical ? current.phoneVerifiedAt : null,
+              consentAt: consent ? current.consentAt || new Date() : null,
+            },
+          });
+          if (
+            !sharePhone ||
+            !consent ||
+            !parsed.visible ||
+            current.phone !== canonical
+          )
+            await tx.contactRequest.updateMany({
+              where: { donorId: donor.id, status: "APPROVED" },
+              data: { status: "REVOKED", phoneHash: null, expiresAt: null },
+            });
+        },
+        { maxWait: 10000, timeout: 15000 },
+      );
       return NextResponse.json({ ok: true });
     }
     if (action === "donations") {
@@ -273,6 +282,27 @@ async function handle(
         { error: e.issues.map((issue) => issue.message).join(" ") },
         { status: 400 },
       );
+    }
+    const databaseError = e as { code?: string; meta?: { target?: unknown } };
+    if (databaseError.code?.startsWith("P")) {
+      console.error("API database failure", { code: databaseError.code });
+      const target = databaseError.meta?.target;
+      const phoneConflict =
+        Array.isArray(target) &&
+        target.some((field) => String(field).includes("phone"));
+      const errors: Record<string, string> = {
+        P2002: phoneConflict
+          ? "This contact number is already used by another donor profile."
+          : "These details are already used by another profile.",
+        P2022: "The database needs an update. Please contact the site owner.",
+        P2028: "Saving timed out. Please try again.",
+        P1001: "The database is temporarily unavailable. Please try again.",
+      };
+      if (errors[databaseError.code])
+        return NextResponse.json(
+          { error: errors[databaseError.code] },
+          { status: databaseError.code === "P2002" ? 409 : 503 },
+        );
     }
     const message = e instanceof Error ? e.message : "Request failed";
     const safe =

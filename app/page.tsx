@@ -3,17 +3,17 @@ import Link from "next/link";
 import {
   ArrowRight,
   Search,
-  Phone,
-  HeartHandshake,
   ShieldCheck,
   Droplet,
+  UserRound,
+  ClipboardList,
 } from "lucide-react";
 import { SearchForm } from "@/components/search";
 export default async function Home() {
   const t = await getTranslation();
 
   return (
-    <>
+    <div className="home-experience">
       <section className="hero">
         <div className="hero-copy">
           <div className="hero-symbol" aria-hidden="true">
@@ -42,46 +42,40 @@ export default async function Home() {
         </div>
         <SearchForm compact />
       </section>
-      <section className="how">
-        <div className="section-title">
-          <span className="eyebrow">{t("A simple way to help")}</span>
-          <h2>{t("Find support in three simple steps.")}</h2>
-          <p>{t("Find the right blood group and reach out directly.")}</p>
-        </div>
-        <div className="steps">
-          {[
-            {
-              icon: Search,
-              title: t("Find a match"),
-              text: t(
-                "Choose a blood group and narrow your search by location.",
-              ),
-            },
-            {
-              icon: Phone,
-              title: t("Connect with a donor"),
-              text: t(
-                "View their profile and send a contact request. Their number is shared only after approval.",
-              ),
-            },
-            {
-              icon: HeartHandshake,
-              title: t("Coordinate with care"),
-              text: t(
-                "Confirm availability and arrange donation with your blood bank.",
-              ),
-            },
-          ].map((s, i) => (
-            <article key={s.title}>
-              <div className="step-icon">
-                <s.icon size={25} />
-              </div>
-              <span className="step-number">0{i + 1}</span>
-              <h3>{s.title}</h3>
-              <p>{s.text}</p>
-            </article>
-          ))}
-        </div>
+      <section
+        className="home-shortcuts"
+        aria-label={t("A simple way to help")}
+      >
+        <Link href="/find-donors">
+          <span>
+            <Search size={21} aria-hidden="true" />
+          </span>
+          <div>
+            <strong>{t("Find a donor")}</strong>
+            <small>{t("Choose a blood group")}</small>
+          </div>
+          <ArrowRight size={17} aria-hidden="true" />
+        </Link>
+        <Link href="/dashboard/profile">
+          <span>
+            <UserRound size={21} aria-hidden="true" />
+          </span>
+          <div>
+            <strong>{t("My donor profile")}</strong>
+            <small>{t("Your details. Your availability. Your choice.")}</small>
+          </div>
+          <ArrowRight size={17} aria-hidden="true" />
+        </Link>
+        <Link href="/dashboard/donations">
+          <span>
+            <ClipboardList size={21} aria-hidden="true" />
+          </span>
+          <div>
+            <strong>{t("Donation records")}</strong>
+            <small>{t("Recorded donations")}</small>
+          </div>
+          <ArrowRight size={17} aria-hidden="true" />
+        </Link>
       </section>
       <section className="join">
         <div>
@@ -97,6 +91,6 @@ export default async function Home() {
           {t("Become a donor")} <ArrowRight size={18} />
         </Link>
       </section>
-    </>
+    </div>
   );
 }

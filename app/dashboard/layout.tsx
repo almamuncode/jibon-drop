@@ -9,7 +9,7 @@ export default async function DashboardLayout({
 }) {
   if (!(await currentDonor())) redirect("/login");
   return (
-    <div className="container">
+    <div className="container user-dashboard">
       <DashboardNav />
       {children}
     </div>

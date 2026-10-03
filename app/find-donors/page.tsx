@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { SearchForm } from "@/components/search";
 import { Avatar, Notice } from "@/components/ui";
-import { Contact } from "@/components/contact";
 import { db } from "@/lib/db";
 import { published, publicSelect, validateHierarchy } from "@/lib/public";
 import { bloodGroups } from "@/lib/validation";
@@ -198,7 +197,6 @@ export default async function Finder({
               <Link className="text-link" href={"/donors/" + d.publicId}>
                 {t("View profile →")}{" "}
               </Link>
-              <Contact publicId={d.publicId} />
             </article>
           ))}
         </div>
@@ -221,7 +219,7 @@ export default async function Finder({
     </>
   );
   return (
-    <div className="container">
+    <div className="container donor-search-page">
       <div className="page-intro">
         <span className="eyebrow">{t("Here when you need a connection")}</span>
         <h1>{t("Find blood donors")}</h1>

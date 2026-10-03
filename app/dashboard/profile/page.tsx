@@ -2,6 +2,7 @@ import { getLocale, getTranslation } from "@/lib/i18n-server";
 import { requireDonor } from "@/lib/security";
 import { ProfileEditor } from "@/components/profile-editor";
 import { AccountActions } from "@/components/dashboard";
+import { db } from "@/lib/db";
 import { locationLabel } from "@/lib/public";
 export default async function EditProfile() {
   const t = await getTranslation();
@@ -9,7 +10,7 @@ export default async function EditProfile() {
 
   const d = await requireDonor();
   return (
-    <div className="editor-width">
+    <div className="editor-width user-profile-page">
       <div className="page-intro">
         <h1>{t("My donor profile")}</h1>
         <p>{t("Your details. Your availability. Your choice.")}</p>
@@ -17,7 +18,13 @@ export default async function EditProfile() {
       <ProfileEditor
         profile={{
           name: d.name,
+          donationCount: d.donationCount,
+          requestCount: await db().contactRequest.count({
+            where: { donorId: d.id },
+          }),
           bloodGroup: d.bloodGroup,
+          dateOfBirth: d.dateOfBirth?.toISOString().slice(0, 10) || "",
+          weightKg: d.weightKg,
           divisionId: d.divisionId,
           districtId: d.districtId,
           localityId: d.localityId,
@@ -38,7 +45,7 @@ export default async function EditProfile() {
           ),
         }}
       />
-      <section className="dashboard-panel">
+      <section className="dashboard-panel profile-account-actions">
         <h2>{t("Delete my profile")}</h2>
         <p>
           {t(
