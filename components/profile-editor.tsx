@@ -1,7 +1,7 @@
 "use client";
 import { useTranslation } from "@/components/language";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Locations, LocationValue } from "./locations";
 import { PhotoEditor } from "./photo";
@@ -49,6 +49,14 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
   const [editing, setEditing] = useState(false);
   const [visible, setVisible] = useState(p.visible);
   const [message, setMessage] = useState("");
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  useEffect(() => {
+    const desktop = matchMedia("(min-width: 641px)");
+    const sync = () => setDetailsOpen(desktop.matches);
+    sync();
+    desktop.addEventListener("change", sync);
+    return () => desktop.removeEventListener("change", sync);
+  }, []);
   if (!editing)
     return (
       <section className="profile-overview dashboard-panel">
@@ -94,7 +102,11 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             <ChevronRight size={16} aria-hidden="true" />
           </Link>
         </div>
-        <details className="profile-summary-details">
+        <details
+          className="profile-summary-details"
+          open={detailsOpen}
+          onToggle={(event) => setDetailsOpen(event.currentTarget.open)}
+        >
           <summary>{t("Profile details")}</summary>
           <dl className="profile-details">
             <div>

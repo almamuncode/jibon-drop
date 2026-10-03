@@ -45,7 +45,8 @@ export default async function EditProfile() {
           ),
         }}
       />
-      <section className="dashboard-panel profile-account-actions">
+      <details className="dashboard-panel profile-account-actions">
+        <summary>{t("Account management")}</summary>
         <h2>{t("Delete my profile")}</h2>
         <p>
           {t(
@@ -53,7 +54,7 @@ export default async function EditProfile() {
           )}{" "}
         </p>
         <AccountActions showLogout={false} />
-      </section>
+      </details>
     </div>
   );
 }

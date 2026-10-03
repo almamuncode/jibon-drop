@@ -22,8 +22,10 @@ export default async function Profile({
   return (
     <div className="container narrow public-donor-page">
       <article className="profile-card">
-        <Avatar name={d.name} url={d.imageUrl} />
-        <span className="blood-badge">{d.bloodGroup}</span>
+        <div className="public-profile-photo-row">
+          <Avatar name={d.name} url={d.imageUrl} />
+          <span className="blood-badge">{d.bloodGroup}</span>
+        </div>
         <h1>{d.name}</h1>
         <p>
           {await locationLabel(
@@ -31,9 +33,11 @@ export default async function Profile({
             locale,
           )}
         </p>
-        <span className={"status " + (!d.available ? "unavailable" : "")}>
-          {d.available ? t("Available") : t("Temporarily unavailable")}
-        </span>
+        <div className="public-profile-badges">
+          <span className={"status " + (!d.available ? "unavailable" : "")}>
+            {d.available ? t("Available") : t("Temporarily unavailable")}
+          </span>
+        </div>
         <dl>
           <div>
             <dt>{t("Donations recorded (self-reported)")}</dt>

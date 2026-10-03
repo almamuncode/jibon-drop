@@ -2941,3 +2941,308 @@ footer .footer-socials a:hover {
     border-radius: 20px;
   }
 }
+
+.public-profile-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 22px;
+}
+.public-donor-page .profile-card .public-profile-badges .blood-badge {
+  float: none;
+  position: static;
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .public-donor-page .profile-card > p {
+    margin: 8px 0;
+  }
+  .public-donor-page .donor-contact > .button {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  .public-donor-page .profile-card > .muted {
+    margin-top: 16px;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+}
+
+.public-profile-photo-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+}
+.public-donor-page .public-profile-photo-row .blood-badge {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  float: none;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  min-width: 64px;
+  min-height: 64px;
+  padding: 10px;
+  border: 3px solid var(--surface);
+  border-radius: 18px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+}
+@media (max-width: 640px) {
+  .public-donor-page .public-profile-photo-row .avatar {
+    margin: 0;
+  }
+  .public-profile-photo-row {
+    margin-bottom: 18px;
+  }
+}
+
+/* Desktop donor profile: a prominent identity header and balanced content. */
+@media (min-width: 641px) {
+  .public-donor-page {
+    max-width: 960px;
+    padding-top: 48px;
+    padding-bottom: 64px;
+  }
+  .public-donor-page .profile-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 28px;
+    padding: 64px 40px 32px;
+    border-radius: 28px;
+    background: linear-gradient(var(--primary) 0 130px, var(--surface) 130px);
+    box-shadow: var(--shadow);
+  }
+  .public-donor-page .public-profile-photo-row {
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+  }
+  .public-donor-page .public-profile-photo-row .avatar {
+    width: 128px;
+    height: 128px;
+    border: 6px solid var(--surface);
+    box-shadow: 0 0 0 2px var(--surface);
+    font-size: 36px;
+  }
+  .public-donor-page .public-profile-photo-row .blood-badge {
+    right: 24px;
+    min-width: 80px;
+    min-height: 80px;
+    font-size: 32px;
+    border-radius: 22px;
+  }
+  .public-donor-page .profile-card h1 {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 32px;
+    line-height: 1.25;
+    letter-spacing: -0.6px;
+    margin: 0 0 10px;
+    overflow-wrap: anywhere;
+  }
+  .public-donor-page .profile-card > p:not(.muted) {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--muted);
+    margin: 0;
+  }
+  .public-donor-page .public-profile-badges {
+    grid-column: 1 / -1;
+    margin-bottom: 32px;
+  }
+  .public-donor-page .profile-card > dl {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--subtle);
+    align-self: start;
+  }
+  .public-donor-page .profile-card > dl > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .public-donor-page .profile-card dt {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .public-donor-page .profile-card dd {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .public-donor-page .donor-contact {
+    margin: 0;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    align-self: start;
+    min-width: 0;
+  }
+  .public-donor-page .donor-contact > .button {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .public-donor-page .donor-contact > .button:hover {
+    background: var(--primary-hover);
+  }
+  .public-donor-page .profile-card > .muted {
+    grid-column: 1 / -1;
+    margin: 28px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    line-height: 1.7;
+    text-align: center;
+  }
+}
+
+.profile-account-actions > summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+@media (min-width: 641px) {
+  .user-profile-page {
+    max-width: 1000px;
+  }
+  .user-profile-page .profile-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 28px;
+    padding: 32px;
+  }
+  .user-profile-page .profile-overview .profile-identity {
+    grid-column: 1 / -1;
+    padding: 24px;
+    background: var(--subtle);
+    border-radius: 20px;
+    gap: 22px;
+  }
+  .user-profile-page .profile-overview .profile-identity > div:not(.avatar) {
+    flex: 1;
+  }
+  .user-profile-page .profile-overview .avatar {
+    width: 100px;
+    height: 100px;
+    border: 4px solid var(--surface);
+  }
+  .user-profile-page .profile-overview .blood-badge {
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+  }
+  .user-profile-page .mobile-profile-content {
+    display: block;
+    grid-column: 2;
+    grid-row: 2 / 4;
+    border-left: 1px solid var(--line);
+    padding-left: 24px;
+  }
+  .user-profile-page .mobile-profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .user-profile-page .mobile-profile-stats > div {
+    padding: 14px 6px;
+    text-align: center;
+    background: var(--subtle);
+    border-radius: 12px;
+  }
+  .user-profile-page .mobile-profile-stats strong {
+    display: block;
+    font-size: 22px;
+  }
+  .user-profile-page .mobile-profile-stats span {
+    display: block;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .user-profile-page .mobile-profile-availability {
+    margin-bottom: 18px;
+  }
+  .user-profile-page .mobile-profile-availability strong {
+    font-size: 13px;
+  }
+  .user-profile-page .mobile-profile-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--subtle);
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .user-profile-page .mobile-profile-action span {
+    flex: 1;
+  }
+  .user-profile-page .profile-summary-details {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .user-profile-page .profile-details {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .user-profile-page .profile-details > div {
+    display: block;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    min-width: 0;
+  }
+  .user-profile-page .profile-details dt {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .user-profile-page .profile-details dd {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .user-profile-page .profile-edit-button {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .user-profile-page .profile-account-actions {
+    padding: 20px 24px;
+    margin-top: 20px;
+  }
+  .user-profile-page .profile-account-actions h2 {
+    font-size: 20px;
+    margin-top: 20px;
+  }
+}
