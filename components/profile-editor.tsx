@@ -127,7 +127,13 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             </div>
             <div>
               <dt>{t("Availability")}</dt>
-              <dd>{p.available ? t("Willing to donate") : t("Unavailable")}</dd>
+              <dd>
+                <span
+                  className={`profile-detail-status${p.available ? " positive" : ""}`}
+                >
+                  {p.available ? t("Willing to donate") : t("Unavailable")}
+                </span>
+              </dd>
             </div>
             <div>
               <dt>{t("Phone sharing")}</dt>
@@ -141,7 +147,13 @@ export function ProfileEditor({ profile: p }: { profile: Profile }) {
             </div>
             <div>
               <dt>{t("Directory listing")}</dt>
-              <dd>{p.visible && p.consent ? t("Public") : t("Private")}</dd>
+              <dd>
+                <span
+                  className={`profile-detail-status${p.visible && p.consent ? " positive" : ""}`}
+                >
+                  {p.visible && p.consent ? t("Public") : t("Private")}
+                </span>
+              </dd>
             </div>
             <div>
               <dt>{t("Public profile consent")}</dt>

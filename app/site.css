@@ -3246,3 +3246,50 @@ footer .footer-socials a:hover {
     margin-top: 20px;
   }
 }
+
+@media (min-width: 641px) {
+  .user-profile-page .profile-details {
+    gap: 10px;
+    padding: 16px;
+    background: var(--subtle);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+  .user-profile-page .profile-details > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .user-profile-page .profile-details dt {
+    margin: 0;
+    line-height: 1.4;
+  }
+  .user-profile-page .profile-details dd {
+    text-align: start;
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+    width: 100%;
+  }
+  .user-profile-page .profile-details > div:nth-child(n + 5) {
+    background: var(--surface);
+  }
+  .profile-detail-status {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--subtle);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .profile-detail-status.positive {
+    color: var(--success);
+    background: var(--success-bg);
+  }
+}
