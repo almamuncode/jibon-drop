@@ -2487,6 +2487,19 @@ html[lang="bn"] :is(h1, h2, h3) {
   gap: 12px 24px;
   margin-bottom: 20px;
 }
+@media (max-width: 640px) {
+  footer {
+    align-items: center;
+    text-align: center;
+  }
+  footer .footer-links,
+  footer .footer-socials {
+    justify-content: center;
+  }
+  footer .install-app {
+    margin-inline: auto;
+  }
+}
 .footer-socials {
   display: flex;
   gap: 10px;
