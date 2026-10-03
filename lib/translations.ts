@@ -1,4 +1,6 @@
 export const bangla: Record<string, string> = {
+  "This is a private project and is not intended for public use.":
+    "এটি একটি ব্যক্তিগত প্রকল্প এবং জনসাধারণের ব্যবহারের জন্য নয়।",
   "Meet our team": "আমাদের টিমের সঙ্গে পরিচিত হোন",
   "The people building JibonDrop and connecting our community.":
     "যারা জীবনড্রপ তৈরি করছেন এবং আমাদের কমিউনিটিকে যুক্ত করছেন।",

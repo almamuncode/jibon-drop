@@ -432,6 +432,14 @@ footer {
 footer p {
   margin: 5px 0;
 }
+.private-project-notice {
+  margin: 0;
+  padding: 16px 24px 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
 footer a:not(.wordmark) {
   font-weight: 600;
 }

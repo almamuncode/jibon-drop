@@ -129,6 +129,9 @@ export default async function Layout({
               </p>
             </div>
           </footer>
+          <p className="private-project-notice">
+            {t("This is a private project and is not intended for public use.")}
+          </p>
           <MobileNavigation />
         </LanguageProvider>
       </body>
