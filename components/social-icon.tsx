@@ -16,7 +16,11 @@ export function SocialIcon({
       aria-hidden="true"
     >
       {platform === "Facebook" && (
-        <path d="M14 22v-9h3l.5-4H14V7c0-1.2.4-2 2-2h2V1.5C17 1.2 16 1 15 1c-3 0-5 2-5 5v3H7v4h3v9" />
+        <path
+          fill="currentColor"
+          stroke="none"
+          d="M14 22v-9h3l.5-4H14V7c0-1.2.4-2 2-2h2V1.5C17 1.2 16 1 15 1c-3 0-5 2-5 5v3H7v4h3v9Z"
+        />
       )}
       {platform === "Instagram" && (
         <>

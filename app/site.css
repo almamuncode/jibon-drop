@@ -2479,6 +2479,17 @@ html[lang="bn"] :is(h1, h2, h3) {
   gap: 12px 24px;
   margin-bottom: 20px;
 }
+.community-invitation {
+  display: flex;
+  justify-content: center;
+  padding: 0 24px 48px;
+}
+.community-invitation .button {
+  text-align: center;
+}
+.community-invitation svg {
+  flex-shrink: 0;
+}
 .footer-socials {
   display: flex;
   gap: 10px;
@@ -2490,12 +2501,21 @@ footer .footer-socials a {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 50%;
+  color: var(--red);
+  background: transparent;
+  border: 0;
+}
+footer .footer-socials svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 footer .footer-socials a:hover {
-  background: var(--soft);
-  color: var(--red);
+  opacity: 0.8;
+}
+footer .footer-socials a:focus-visible {
+  outline: 2px solid var(--dark);
+  outline-offset: 3px;
 }
 
 .profile-health-fields {
@@ -3292,4 +3312,112 @@ footer .footer-socials a:hover {
     color: var(--success);
     background: var(--success-bg);
   }
+}
+
+.footer-team {
+  flex-shrink: 0;
+}
+.footer-team h2 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.footer-team-member {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.footer-team-member img {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+.footer-team-member strong {
+  font-size: 14px;
+}
+.footer-team-member p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+@media (min-width: 641px) and (max-width: 1000px) {
+  footer {
+    flex-wrap: wrap;
+  }
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 48px;
+  flex-shrink: 0;
+}
+.brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.brand-logo .brand-logo-white {
+  display: none;
+}
+:root[data-theme="dark"]:not(:has(#theme-switch)) .brand-logo-original,
+:root:has(#theme-switch:checked) .brand-logo-original {
+  display: none;
+}
+:root[data-theme="dark"]:not(:has(#theme-switch)) .brand-logo-white,
+:root:has(#theme-switch:checked) .brand-logo-white {
+  display: block;
+}
+.footer-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.wordmark .footer-brand-name {
+  color: var(--dark);
+}
+@media (max-width: 640px) {
+  .nav-wrap .brand-logo {
+    width: 26px;
+    height: 36px;
+  }
+}
+
+.team-page {
+  padding-bottom: 64px;
+}
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 320px));
+  gap: 24px;
+}
+.team-member-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.team-member-card > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.team-member-card > div {
+  padding: 22px;
+}
+.team-member-card h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+.team-member-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
 }

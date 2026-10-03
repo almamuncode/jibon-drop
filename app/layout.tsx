@@ -1,7 +1,7 @@
 import { getLocale, getTranslation } from "@/lib/i18n-server";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { Droplet } from "lucide-react";
+import Image from "next/image";
 import { SocialIcon } from "@/components/social-icon";
 import { PwaInstall } from "@/components/pwa";
 import { AuthNavigation, MobileNavigation } from "@/components/auth-navigation";
@@ -46,7 +46,9 @@ export default async function Layout({
   const socials = [
     {
       label: "Facebook",
-      url: process.env.NEXT_PUBLIC_FACEBOOK_URL,
+      url:
+        process.env.NEXT_PUBLIC_FACEBOOK_URL ||
+        "https://www.facebook.com/jibondropapp",
       icon: "Facebook" as const,
     },
     {
@@ -76,8 +78,23 @@ export default async function Layout({
           <header className="site-header">
             <div className="nav-wrap">
               <Link className="wordmark" href="/">
-                <span className="brand-icon">
-                  <Droplet size={22} strokeWidth={1.8} />
+                <span className="brand-logo" aria-hidden="true">
+                  <Image
+                    className="brand-logo-original"
+                    src="/icons/logo.png"
+                    alt=""
+                    width={706}
+                    height={981}
+                    sizes="36px"
+                  />
+                  <Image
+                    className="brand-logo-white"
+                    src="/icons/logo-white.png"
+                    alt=""
+                    width={707}
+                    height={981}
+                    sizes="36px"
+                  />
                 </span>
                 <span className="brand-name">
                   <span lang="en">JibonDrop</span>
@@ -93,9 +110,29 @@ export default async function Layout({
           <main id="main">{children}</main>
           <footer>
             <div>
-              <Link className="wordmark" href="/">
-                {t("Jibon")}
-                <span>{t("Drop")}</span>
+              <Link className="wordmark footer-wordmark" href="/">
+                <span className="brand-logo" aria-hidden="true">
+                  <Image
+                    className="brand-logo-original"
+                    src="/icons/logo.png"
+                    alt=""
+                    width={706}
+                    height={981}
+                    sizes="36px"
+                  />
+                  <Image
+                    className="brand-logo-white"
+                    src="/icons/logo-white.png"
+                    alt=""
+                    width={707}
+                    height={981}
+                    sizes="36px"
+                  />
+                </span>
+                <span className="footer-brand-name">
+                  {t("Jibon")}
+                  <span>{t("Drop")}</span>
+                </span>
               </Link>
               <p>{t("A drop of blood. A gift of life.")}</p>
               <PwaInstall />
@@ -120,6 +157,7 @@ export default async function Layout({
                 <Link href="/about">{t("About Us")}</Link>
                 <Link href="/privacy">{t("Privacy")}</Link>
                 <Link href="/guide">{t("User Guide")}</Link>
+                <Link href="/team">{t("Team")}</Link>
               </nav>
               <p>
                 {t("For urgent care, contact your hospital or blood bank.")}

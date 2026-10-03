@@ -1,4 +1,10 @@
 export const bangla: Record<string, string> = {
+  "Join our Facebook community": "আমাদের ফেসবুক কমিউনিটিতে যোগ দিন",
+  "Meet our team": "আমাদের টিমের সঙ্গে পরিচিত হোন",
+  "The people building JibonDrop and connecting our community.":
+    "যারা জীবনড্রপ তৈরি করছেন এবং আমাদের কমিউনিটিকে যুক্ত করছেন।",
+  Team: "টিম",
+  "Full Stack Web Developer": "ফুল স্ট্যাক ওয়েব ডেভেলপার",
   "This contact number is already used by another donor profile.":
     "এই নম্বর অন্য একটি রক্তদাতা প্রোফাইলে ব্যবহৃত হচ্ছে।",
   "These details are already used by another profile.":
